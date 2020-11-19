@@ -4,9 +4,7 @@
 #include <iostream>
 
 #define zero_vec(x, n) memset(x, 0, n*sizeof (double))
-// move_vec doesnt delete any memory, just copies it
-#define move_vec(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
-#define move_matrix(m1, m2) memmove(m2, m1, sizeof m2);
+#define move_x(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
 #define size_eq(vec1, vec2) (vec1.len() == vec2.len())
 
 CVec::CVec(){
@@ -35,6 +33,16 @@ CVec::CVec(int n, bool col_vec){
     column_vec = col_vec;
 }
 
+CVec::CVec(const CVec& copy_from){
+    // initialize this object as the object we want
+    column_vec = copy_from.column_vec;
+    cur_size  = copy_from.len();
+    vec = new double[cur_size];
+    
+    // be sure that this works -> should work since double is primitive & only one level of pointer
+    memmove(vec, copy_from.vec, cur_size*sizeof (double));
+}
+
 CVec::~CVec(){
     if(vec) delete[] vec;
 }
@@ -45,6 +53,21 @@ int CVec::len() const{
 
 void CVec::transpose(){
     column_vec = !column_vec;
+}
+
+void CVec::print_vec(){
+    if(column_vec){
+        std::cout << "==Column vector, size: " << cur_size << std::endl;
+        for(int i=0; i<cur_size; i++)
+            std::cout << vec[i] << std::endl; 
+    }
+    else{
+        std::cout << "==Row vector, size: " << cur_size << std::endl;
+        for(int i=0; i<cur_size; i++)
+            std::cout << " " << vec[i];
+        std::cout << std::endl;
+    }
+    std::cout << "==End vector\n" << std::endl;
 }
 
 // assume that an index > size is a mistake. A negative index < -size = backward indexing.
@@ -65,8 +88,20 @@ bool CVec::operator==(const CVec& oth_vec) const{
 
     return true;
 }
-void CVec::operator=(CVec* oth_vec){
-    move_vec(this, oth_vec);
+// WARNING: only works if you've dynamically allocated the new_arr and is same length
+// Would be fatal if not.
+void CVec::operator=(double* new_arr){
+    // assign vec
+    vec = new_arr;
+}
+void CVec::operator=(CVec& oth_vec){
+    // move the memory from oth_vec to this vec
+    column_vec = oth_vec.column_vec;
+    cur_size  = oth_vec.len();
+    vec = new double[cur_size];
+    
+    // be sure that this works -> should work since double is primitive & only one level of pointer
+    memmove(vec, oth_vec.vec, cur_size*sizeof (double));
 }
 // TODO: these operators are basically repeated code -> use a macro for them.
 CVec CVec::operator+(const CVec& oth_vec){
@@ -106,7 +141,7 @@ double CVec::operator*(const CVec& oth_vec){
     if(len() != oth_vec.len()) return false;
 
     // compute dot product
-    double scalar_sum;
+    double scalar_sum = 0;
     for(int i=0; i<len(); i++)
         scalar_sum += vec[i] * oth_vec[i];
 
@@ -114,7 +149,7 @@ double CVec::operator*(const CVec& oth_vec){
 }
 
 void CVec::resize(int new_size){
-    if(new_size <= 0) throw INVALID_OP;
+    if(new_size <= 0 || new_size > dbl_stack) throw INVALID_OP;
     double* new_vec = new double[new_size];
 
     // if new len > cur_size, append zeros (memset new_len-cur_size)
@@ -152,6 +187,17 @@ CMatrix::CMatrix(int row_len, int col_len){
     m = col_len;
 }
 
+CMatrix::CMatrix(const CMatrix& copy_from){
+    n = copy_from.rows();
+    m = copy_from.cols();
+    // copy the matrix row by row with CVec copy constructor
+    matrix = new CVec[n];
+
+    for(int i=0; i<n; i++){
+        matrix[i] = CVec(copy_from.matrix[i]);
+    }
+}
+
 CMatrix::~CMatrix(){
     // NOTE: may have to use for loop delete instead
     delete[] matrix;
@@ -168,7 +214,7 @@ void CMatrix::print_matrix(){
         // end line
         std::cout << "\n";
     }
-    std::cout<< "------END Matrix" << std::endl;
+    std::cout<< "===END Matrix\n" << std::endl;
 }
 
 int CMatrix::rows() const{
@@ -187,55 +233,30 @@ CVec CMatrix::get_dimensions(){
     return dimensions;
 }
 
-CMatrix CMatrix::copy_matrix(){
-    CMatrix res(rows(), cols());
-    move_matrix(this, &res);
-
-    return res;
-}
-
 void CMatrix::transpose(){
     // simply reverse rows and cols [i, j] -> [j, i]
-    CMatrix temp(rows(), cols());
-    move_matrix(this, &temp);
+    CMatrix temp(*this); // temp should be auto deleted as we exit this function
     
     for(int i=0; i<rows(); i++){
         for(int j=0; j<cols(); j++){
             matrix[i][j] = temp[j][i];
         }
     }
-
-    // temp should be deleted as we exit this function
-    // delete &temp;
 }
 
-// NOTE: probably have to return a heap allocated object
-// QUESTION: If we return a heap alloced object and assign it to a pointer,
-// does the object's destructor function get called after we exit main()?
-CMatrix* CMatrix::operator*(const CMatrix& m2){
+CMatrix CMatrix::operator*(const CMatrix& m2){
     if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;
 
-    CMatrix* res_matrix = new CMatrix(rows(), m2.cols());
+    CMatrix res_matrix(rows(), m2.cols());
     for(int i = 0; i<rows(); i++)
         for(int j = 0; j<m2.cols(); j++)
             for(int k = 0; k<cols(); k++)
-                res_matrix->matrix[i][j] += matrix[i][k] * m2[k][j];
+                res_matrix[i][j] += matrix[i][k] * m2[k][j];
         
     return res_matrix;
 }
-bool CMatrix::operator==(const CMatrix& m2){
-    if(rows() != m2.rows() && cols() != m2.cols()) return false;
-    // compare elementwise
-    for(int r = 0; r < rows(); r++){
-        for(int c = 0; c < cols(); c++){
-            if(matrix[r][c] != m2[r][c]) return false;
-        }
-    }
-
-    return true;
-}
-CMatrix* CMatrix::operator&(const CMatrix& m2){
-    CMatrix* res = new CMatrix(rows()*m2.rows(), cols()*m2.cols());
+CMatrix CMatrix::operator&(const CMatrix& m2){
+    CMatrix res(rows()*m2.rows(), cols()*m2.cols());
     // multiply two matrices (n x m) & (p x q) so that we end up with (np x mq)
     // O(nmpq) space complexity -> O(n^4) time worst case square matrices of same size
     for(int i=0; i<rows(); i++){
@@ -255,6 +276,18 @@ CMatrix* CMatrix::operator&(const CMatrix& m2){
 
     return res;
 }
+bool CMatrix::operator==(const CMatrix& m2){
+    if(rows() != m2.rows() && cols() != m2.cols()) return false;
+    // compare elementwise
+    for(int r = 0; r < rows(); r++){
+        for(int c = 0; c < cols(); c++){
+            if(matrix[r][c] != m2[r][c]) return false;
+        }
+    }
+
+    return true;
+}
+
 // don't have to worry about indexing m, since handled by cvec
 CVec& CMatrix::operator[](int i) const{
     if(abs(i) >= n) throw OUT_OF_BOUNDS;
@@ -263,7 +296,7 @@ CVec& CMatrix::operator[](int i) const{
     return matrix[indexer];
 }
 
-CMatrix* CMatrix::matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg){
+CMatrix CMatrix::matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg){
     // ensure that m1 and m2 are the right dimensions
     CVec d1 = m1.get_dimensions();
     CVec d2 = m2.get_dimensions();
@@ -287,8 +320,8 @@ CMatrix* CMatrix::matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult
 
 // MULTIPLICATION ALGORITHMS
 
-CMatrix* CMatrix::parallel_multiply(CMatrix& m2, int p){
-    CMatrix* res = new CMatrix(cols(), m2.rows());
+CMatrix CMatrix::parallel_multiply(CMatrix& m2, int p){
+    CMatrix res(cols(), m2.rows());
     // set threads = p
 
     // parallel for loop/div and conquer (not strassen)
@@ -296,16 +329,16 @@ CMatrix* CMatrix::parallel_multiply(CMatrix& m2, int p){
     return res;
 }
 
-CMatrix* CMatrix::strassen_multiply(CMatrix& m2){
-    CMatrix* res = new CMatrix(cols(), m2.rows());
+CMatrix CMatrix::strassen_multiply(CMatrix& m2){
+    CMatrix res(cols(), m2.rows());
 
     // divide and conquer
 
     return res;
 }
 
-CMatrix* CMatrix::mc_multiply(CMatrix& m2){
-    CMatrix* res = new CMatrix(cols(), m2.rows());
+CMatrix CMatrix::mc_multiply(CMatrix& m2){
+    CMatrix res(cols(), m2.rows());
 
     // randomized
 

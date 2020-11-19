@@ -24,6 +24,8 @@ public:
     // creates a vector of size n with zeros
     CVec(int); 
     CVec(int, bool);
+    // copy constructor
+    CVec(const CVec&);
     ~CVec();
 
     void transpose(); //column_vec -> set to opposite
@@ -31,10 +33,12 @@ public:
     // size_t& resize(); //how to do this? Just use the below for now.
     // e.g. cvec.resize(4) -> cvec becomes length 4.
     void resize(int);
+    void print_vec();
 
     // vector indexer. values are assignable.
     double& operator[](int i) const; //array access -> supports negative indexes
-    void operator=(CVec* oth_vec); // move that vector's memory to this one
+    void operator=(double*); // assign to a new array
+    void operator=(CVec& oth_vec); // move that vector's memory to this one
     bool operator!=(const CVec&) const;
     bool operator==(const CVec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
     CVec operator+(const CVec&); //elementwise addition
@@ -42,9 +46,6 @@ public:
     CVec operator/(const CVec&); //elementwise division
     double operator*(const CVec&); //inner product
     // CMatrix operator&(const CVec&); //tensor (outer) product
-
-    // make a deep copy of this vector to new_vec
-    void copy_to(const CVec& new_vec);
 };
 
 enum matrix_mult_types{
@@ -63,6 +64,7 @@ public:
     // Creates a 1x1 matrix of 0
     CMatrix();
     CMatrix(int n, int m);
+    CMatrix(const CMatrix&); // const reference means we cant reassign that reference to something else. But I think we can still change its internals unless we pass as a const X const.
     ~CMatrix();
     
     /////////////////////
@@ -73,10 +75,8 @@ public:
     int cols() const;
     void transpose(); // note that conjugate transpose of real is just transpose
     CVec get_dimensions();
-    CMatrix* matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg); //used to choose a multiplication algorithm
     CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
     void replace(CVec v, double); // assign to m[i, j] a double
-    CMatrix copy_matrix();
     void print_matrix();
 
     /////////////
@@ -85,8 +85,8 @@ public:
 
     // double operator[](CVec v); // matrix access m[i, j] for ith row, jth column
     bool operator==(const CMatrix&);
-    CMatrix* operator*(const CMatrix&); // standard O(n^3) multiplication
-    CMatrix* operator&(const CMatrix&); // tensor product/kronecker product
+    CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
+    CMatrix operator&(const CMatrix&); // tensor product/kronecker product
     CVec& operator[](int i) const; // get the ith row (transposed vector)
     // void operator[](int i); // assign to ith row
 
@@ -94,11 +94,13 @@ public:
     // ENHANCED MULTIPLICATION METHODS
     ///////////////////////////////////
 
+    // abstraction to choose a multiplication algorithm
+    CMatrix matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg);
     // p -> number of threads to use[]
-    CMatrix* parallel_multiply(CMatrix&, int p);
+    CMatrix parallel_multiply(CMatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    CMatrix* strassen_multiply(CMatrix&);
+    CMatrix strassen_multiply(CMatrix&);
     // multiply the matrices in monte-carlo style
-    CMatrix* mc_multiply(CMatrix&);
+    CMatrix mc_multiply(CMatrix&);
 
 };

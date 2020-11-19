@@ -45,29 +45,48 @@ void t2(){
 }
 
 // print current matrix
-void print_cmatrix(CMatrix& m){
-    // print each row, line by line
-    std::cout<< "===Matrix:" << m.rows() << "x" << m.cols() << "====" << std::endl;
-    for(int i=0; i<m.rows(); i++){
-        for(int j=0; j<m.cols(); j++){
-            std::cout << " " << m[i][j]; 
-        }
-        // end line
-        std::cout << "\n";
-    }
-    std::cout<< "------END Matrix" << std::endl;
-}
+// void print_cmatrix(CMatrix& m){
+//     // print each row, line by line
+//     std::cout<< "===Matrix:" << m.rows() << "x" << m.cols() << "====" << std::endl;
+//     for(int i=0; i<m.rows(); i++){
+//         for(int j=0; j<m.cols(); j++){
+//             std::cout << " " << m[i][j]; 
+//         }
+//         // end line
+//         std::cout << "\n";
+//     }
+//     std::cout<< "------END Matrix" << std::endl;
+// }
 
-int main(){
+void t3(){
     CMatrix cmat1(10, 10);
     CMatrix cmat2(10, 10);
 
-    CMatrix res = *(cmat1 * cmat2);
-    CMatrix res2 = *(cmat1 & cmat2);
+    CMatrix res = cmat1 * cmat2;
+    CMatrix res2 = cmat1 & cmat2;
     // std::cout << res[0][1] << std::endl;
 
     // print out res
-    print_cmatrix(res2);
+    res2.print_matrix();
+}
+
+void t4(){
+    CVec cv(10);
+    CVec cv2(10);
+
+    double* x = new double[10];
+    for(int i=0; i<10; i++) x[i] = 0.5 + i;
+    cv = x;
+
+    cv.print_vec();
+
+    cv.transpose();
+    cv.print_vec();
+}
+
+int main(){
+    t3();
+    t4();
 
     return 0;
 }
