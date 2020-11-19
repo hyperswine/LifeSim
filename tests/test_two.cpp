@@ -34,12 +34,13 @@ void t1(){
 }
 
 int main(){
-    CMatrix cmat;
-    // CVec cvec(100);
-    // CVec cvec2(100);
+    CMatrix cmat(1, 1);
+    CVec cvec(100);
+    CVec cvec2(100);
 
-    // if (cvec == cvec2) std::cout << "Nice vector!" << std::endl;
+    if (cvec == cvec2) std::cout << "Nice vector!" << std::endl;
+    if (cvec[0] == cvec2[0]) std::cout << "Very nice vector!" << std::endl;
     if (cmat.rows()==1 && cmat.cols()==1) std::cout << "Nice matrix!" << std::endl;
-
+    if (cmat[0][0] == 0) std::cout << "Very nice matrix!" << std::endl;
     return 0;
 }

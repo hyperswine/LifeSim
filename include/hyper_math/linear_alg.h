@@ -20,6 +20,7 @@ private:
     double* vec;
     bool column_vec;
 public:
+    CVec();
     // creates a vector of size n with zeros
     CVec(int n); 
     ~CVec();

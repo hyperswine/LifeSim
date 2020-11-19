@@ -6,6 +6,13 @@
 // move_vec doesnt delete any memory, just copies it
 #define move_vec(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
 
+CVec::CVec(){
+    vec = new double[1];
+    zero_vec(vec, 1);
+    cur_size = 1;
+    column_vec = true;
+}
+
 // create a new vector (max size = dbl_stack -> 50,000 elements)
 CVec::CVec(int n){
     if (n > dbl_stack) throw TOO_LARGE;
@@ -87,6 +94,7 @@ void CVec::resize(int new_size){
 }
 
 // shouldn't use --> good for testing only
+// SOMETHING IS WRONG WITH creation of CVec arrays?
 CMatrix::CMatrix(){
     n = 1;
     m = 1;
@@ -95,18 +103,11 @@ CMatrix::CMatrix(){
 }
 
 CMatrix::CMatrix(int row_len, int col_len){
-    matrix = (CVec*)malloc(n * sizeof (CVec*));
-    for(int i = 0; i<row_len; i++){
-        // TEST: does this work?
-        // I think we should be allocating dynamically
-        matrix[i] = CVec(col_len);
-    }
-    /**
-     * If doesnt work, use:
-     * matrix = new CVec[n];
-     * for (i=0..n) matrix[i].resize(m);
-     */
-
+    // Use this instead
+    matrix = new CVec[row_len];
+    for (int i=0; i<row_len; i++)
+        matrix[i].resize(col_len);
+     
     n = row_len;
     m = col_len;
 }
