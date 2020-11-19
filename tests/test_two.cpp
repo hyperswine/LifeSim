@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string.h>
+#include <random>
 #include "hyper_math/linear_alg.h"
+#include "hyper_math/rng_engine.h"
 
 struct xd{
     int * p;
@@ -84,9 +86,71 @@ void t4(){
     cv.print_vec();
 }
 
+void f1(RAND_ENG::RNG& rng){
+    int x = rng.gen_int();
+    std::cout << "f1() -> number generated: " << x << std::endl;
+}
+
+void t5(){
+    using namespace RAND_ENG;
+    RNG rng_d;
+    double x = rng_d.gen_double(10, 20);
+    int y = rng_d.gen_int(10, 20);
+
+    std::cout << "main() -> double generated: " << x << std::endl;
+    std::cout << "main() -> int generated: " << y << std::endl;
+}
+
 int main(){
-    t3();
-    t4();
+    RAND_ENG::RNG rng;
+
+    CVec cv1 = rng.gen_randvec(10);
+    CVec cv2 = rng.gen_randvec(10);
+
+    // double res = cv1 * cv2;
+    // std::cout << "cv1 * cv2 = " << res << std::endl;
+
+    CVec cv3 = cv1 + cv2;
+    std::cout << "cv1 + cv2 = " << std::endl;
+    cv3.print_vec();
+
+    CVec cv4 = cv1 - cv2;
+    std::cout << "cv1 - cv2 = " << std::endl;
+    cv4.print_vec();
+
+    CVec cv5 = cv1 / cv2;
+    std::cout << "cv1 / cv2 = " << std::endl;
+    cv5.print_vec();
+
+    CVec cv6 = cv5; // deep copy cv5 into cv6
+    std::cout << "cv6 = cv5" << std::endl;
+    cv6.print_vec();
+
+    // generate random matrices
+    
+    CMatrix cm_rand = rng.gen_randmatrix(5, 10);
+    cm_rand.print_matrix();
+    CMatrix cm_rand2 = rng.gen_randmatrix(10, 5);
+    cm_rand.print_matrix();
+
+    // multiply matrices
+    CMatrix cm_rand3 = cm_rand * cm_rand2;
+    cm_rand3.print_matrix();
+
+    CMatrix cm_rand5 = rng.gen_randmatrix(4, 9);
+    cm_rand.print_matrix();
+    CMatrix cm_rand6 = rng.gen_randmatrix(10, 5);
+    cm_rand.print_matrix();
+
+    try
+    {
+        cm_rand5 * cm_rand6;
+    }
+    catch(int x)
+    {
+        std::cerr << "caught! exception code: " << x << '\n';
+    }
+    
 
     return 0;
 }

@@ -147,6 +147,16 @@ double CVec::operator*(const CVec& oth_vec){
 
     return 0;
 }
+CMatrix CVec::operator&(const CVec& oth_vec){
+    CMatrix res(cur_size, oth_vec.len());
+    for(int i=0; i<cur_size; i++){
+        for(int j=0; j<oth_vec.len(); j++){
+            res[i][j] = vec[i] * oth_vec[j];
+        }
+    }
+    
+    return res;
+}
 
 void CVec::resize(int new_size){
     if(new_size <= 0 || new_size > dbl_stack) throw INVALID_OP;

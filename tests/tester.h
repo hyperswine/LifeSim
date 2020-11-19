@@ -16,6 +16,9 @@ protected:
 
     // TODO: have function pointers
 
+    // TODO: have an implicit exception catcher, which catches all exceptions
+    // but prints the exception and exits.
+
 public:
     Tester();
     void assert_eq(bool); // assert a critical condition -> fatal if not

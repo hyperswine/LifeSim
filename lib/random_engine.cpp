@@ -1,11 +1,10 @@
 #include "hyper_math/rng_engine.h"
+#include "hyper_math/linear_alg.h"
 #include <chrono>
 
 using namespace RAND_ENG;
 
 RNG::RNG(SRNG_METHOD s_method, int seed){
-
-
     //type R_TIME -> based on time
     if (s_method == R_TIME){
         using namespace std::chrono;
@@ -22,35 +21,84 @@ RNG::RNG(SRNG_METHOD s_method, int seed){
     }
 }
 
-void RNG::set_seed(unsigned int seed){
-    if (seed == USE_RD){
-        std::random_device* rd = new std::random_device();
-        // NOTE: apparently some errors with this?
-        // generator.seed(rd);
-    }
-    else{
-        // generator.seed(seed);
-    }
-    
+void RNG::set_seed(int seed){
+    generator.seed((seed == USE_RD)? _rd(): seed);
     _seed = seed;
 }
 
-// generates a double between 0-1
-double RNG::gen_double(){
+// generate a double between [a, b]
+double RNG::gen_double(int a, int b){
+    using namespace std;
+    std::uniform_real_distribution<double> dist(a, b);
+
+    return dist(generator);
+}
+
+// generates a very small double between 0-1, usually skewed towards 0
+double RNG::gen_small_double(){
     // generate an int, then return inverse
     return (double) 1 / generator();
 }
 
 // generates an int between 0-2.14b
 int RNG::gen_int(){
-    return 0;
+    return generator();
 }
 
 // generates an int in the closed range [a, b]
 int RNG::gen_int(int a, int b){
     using namespace std;
-    // std::uniform_int_distribution dist(a, b);
+    std::uniform_int_distribution dist(a, b);
 
-    // return dist(generator);
-    return 0;
+    return dist(generator);
+}
+
+CVec RNG::gen_randvec(int length){
+    // make sure to use random device
+    set_seed(USE_RD);
+
+    CVec res(length);
+    for(int i=0; i<length; i++){
+        res[i] = generator();
+    }
+
+    return res;
+}
+
+CVec RNG::gen_randvec(int length, int a, int b){
+    std::uniform_int_distribution dist(a, b);
+
+    CVec res(length);
+    for(int i=0; i<length; i++){
+        res[i] = dist(generator);
+    }
+
+    return res;
+}
+
+CMatrix RNG::gen_randmatrix(int n, int m){
+    set_seed(USE_RD);
+
+    CMatrix res(n, m);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            res[i][j] = generator();
+        }
+    }
+
+    return res;
+}
+
+// args (n, m, a, b)
+CMatrix RNG::gen_randmatrix(int n, int m, int a, int b){
+    std::uniform_int_distribution dist(a, b);
+
+    CMatrix res(n, m);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            res[i][j] = dist(generator);
+        }
+    }
+
+    return res;
 }

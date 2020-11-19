@@ -13,6 +13,9 @@ const int INVALID_OP = -5;
 const int dbl_stack = 50000;
 const int DEFAULT_THREADS = 16;
 
+class CVec;
+class CMatrix;
+
 // vector of double-precision elements
 class CVec{
 private:
@@ -45,7 +48,7 @@ public:
     CVec operator-(const CVec&); //elementwise subtraction
     CVec operator/(const CVec&); //elementwise division
     double operator*(const CVec&); //inner product
-    // CMatrix operator&(const CVec&); //tensor (outer) product
+    CMatrix operator&(const CVec&); //tensor (outer) product
 };
 
 enum matrix_mult_types{
