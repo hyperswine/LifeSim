@@ -22,7 +22,8 @@ private:
 public:
     CVec();
     // creates a vector of size n with zeros
-    CVec(int n); 
+    CVec(int); 
+    CVec(int, bool);
     ~CVec();
 
     void transpose(); //column_vec -> set to opposite
@@ -72,10 +73,11 @@ public:
     int cols() const;
     void transpose(); // note that conjugate transpose of real is just transpose
     CVec get_dimensions();
-    CMatrix matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg); //used to choose a multiplication algorithm
+    CMatrix* matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg); //used to choose a multiplication algorithm
     CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
     void replace(CVec v, double); // assign to m[i, j] a double
-    // void copy_to(const CMatrix& new_matrix);
+    CMatrix copy_matrix();
+    void print_matrix();
 
     /////////////
     // OPERATORS
@@ -83,8 +85,8 @@ public:
 
     // double operator[](CVec v); // matrix access m[i, j] for ith row, jth column
     bool operator==(const CMatrix&);
-    CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
-    CMatrix operator&(const CMatrix&); // tensor product
+    CMatrix* operator*(const CMatrix&); // standard O(n^3) multiplication
+    CMatrix* operator&(const CMatrix&); // tensor product/kronecker product
     CVec& operator[](int i) const; // get the ith row (transposed vector)
     // void operator[](int i); // assign to ith row
 
@@ -93,10 +95,10 @@ public:
     ///////////////////////////////////
 
     // p -> number of threads to use[]
-    CMatrix parallel_multiply(CMatrix&, int p);
+    CMatrix* parallel_multiply(CMatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    CMatrix strassen_multiply(CMatrix&);
+    CMatrix* strassen_multiply(CMatrix&);
     // multiply the matrices in monte-carlo style
-    CMatrix mc_multiply(CMatrix&);
+    CMatrix* mc_multiply(CMatrix&);
 
 };

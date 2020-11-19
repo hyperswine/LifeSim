@@ -33,7 +33,7 @@ void t1(){
     std::cout << "*_xd.p: " << *_xd.p << std::endl;
 }
 
-int main(){
+void t2(){
     CMatrix cmat(1, 1);
     CVec cvec(100);
     CVec cvec2(100);
@@ -42,5 +42,32 @@ int main(){
     if (cvec[0] == cvec2[0]) std::cout << "Very nice vector!" << std::endl;
     if (cmat.rows()==1 && cmat.cols()==1) std::cout << "Nice matrix!" << std::endl;
     if (cmat[0][0] == 0) std::cout << "Very nice matrix!" << std::endl;
+}
+
+// print current matrix
+void print_cmatrix(CMatrix& m){
+    // print each row, line by line
+    std::cout<< "===Matrix:" << m.rows() << "x" << m.cols() << "====" << std::endl;
+    for(int i=0; i<m.rows(); i++){
+        for(int j=0; j<m.cols(); j++){
+            std::cout << " " << m[i][j]; 
+        }
+        // end line
+        std::cout << "\n";
+    }
+    std::cout<< "------END Matrix" << std::endl;
+}
+
+int main(){
+    CMatrix cmat1(10, 10);
+    CMatrix cmat2(10, 10);
+
+    CMatrix res = *(cmat1 * cmat2);
+    CMatrix res2 = *(cmat1 & cmat2);
+    // std::cout << res[0][1] << std::endl;
+
+    // print out res
+    print_cmatrix(res2);
+
     return 0;
 }
