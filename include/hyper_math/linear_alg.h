@@ -7,6 +7,7 @@ const int OUT_OF_BOUNDS = -1;
 const int UNSYMMETRIC_SIZE = -2;
 const int TOO_LARGE = -3;
 const int MEMORY_ERROR = -4;
+const int INVALID_OP = -5;
 
 // we should not be storing anything more than this value in a vector
 const int dbl_stack = 50000;
@@ -17,18 +18,31 @@ class CVec{
 private:
     size_t cur_size;
     double* vec;
+    bool column_vec;
 public:
-    CVec(int n);
+    // creates a vector of size n with zeros
+    CVec(int n); 
     ~CVec();
 
-    void transpose();
-    int len();
+    void transpose(); //column_vec -> set to opposite
+    int len() const;
+    // size_t& resize(); //how to do this? Just use the below for now.
+    // e.g. cvec.resize(4) -> cvec becomes length 4.
+    void resize(int);
 
-    double operator[](int i); //array access -> supports negative indexes
+    // vector indexer. values are assignable.
+    double& operator[](int i) const; //array access -> supports negative indexes
+    void operator=(CVec* oth_vec); // move that vector's memory to this one
+    bool operator!=(const CVec&) const;
+    bool operator==(const CVec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
     CVec operator+(const CVec&); //elementwise addition
     CVec operator-(const CVec&); //elementwise subtraction
+    CVec operator/(const CVec&); //elementwise division
     double operator*(const CVec&); //inner product
-    CVec operator&(const CVec&); //tensor (outer) product
+    // CMatrix operator&(const CVec&); //tensor (outer) product
+
+    // make a deep copy of this vector to new_vec
+    void copy_to(const CVec& new_vec);
 };
 
 enum matrix_mult_types{
@@ -36,39 +50,52 @@ enum matrix_mult_types{
 };
 
 // basically 2D-array with relevant features
-class Matrix{
+class CMatrix{
 private:
     int n;
     int m;
-    // alternative implementation -> use cvecs?
-    double** matrix;
+    CVec* matrix;
 
 public:
-    Matrix(int n, int m);
-    ~Matrix();
+    // Default Constructor. Recommended to use CMatrix(n, m) instead.
+    // Creates a 1x1 matrix of 0
+    CMatrix();
+    CMatrix(int n, int m);
+    ~CMatrix();
+    
+    /////////////////////
+    // USEFUL OPERATIONS
+    /////////////////////
+
     int rows() const;
     int cols() const;
-
     void transpose(); // note that conjugate transpose of real is just transpose
     CVec get_dimensions();
-
-    Matrix matrix_multiply(Matrix m1, Matrix m2, matrix_mult_types mult_alg); //used to choose a multiplication algorithm
-    double hyper_sum(Matrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
-    Matrix operator&(const Matrix&);
-    double operator[](CVec v); // matrix access m[i, j] for ith row, jth column
+    CMatrix matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg); //used to choose a multiplication algorithm
+    CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
     void replace(CVec v, double); // assign to m[i, j] a double
-    CVec operator[](int i) const; // get the ith row (transposed vector)
+    // void copy_to(const CMatrix& new_matrix);
+
+    /////////////
+    // OPERATORS
+    /////////////
+
+    // double operator[](CVec v); // matrix access m[i, j] for ith row, jth column
+    bool operator==(const CMatrix&);
+    CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
+    CMatrix operator&(const CMatrix&); // tensor product
+    CVec& operator[](int i) const; // get the ith row (transposed vector)
     // void operator[](int i); // assign to ith row
 
-    // NOTE: use * operator for the standard algorithm of multiplication
-    Matrix operator*(const Matrix&);
+    ///////////////////////////////////
+    // ENHANCED MULTIPLICATION METHODS
+    ///////////////////////////////////
+
     // p -> number of threads to use[]
-    Matrix parallel_multiply(Matrix&, int p);
+    CMatrix parallel_multiply(CMatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    Matrix strassen_multiply(Matrix&);
+    CMatrix strassen_multiply(CMatrix&);
     // multiply the matrices in monte-carlo style
-    Matrix mc_multiply(Matrix&);
+    CMatrix mc_multiply(CMatrix&);
 
 };
-
-

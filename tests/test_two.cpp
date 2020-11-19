@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include "hyper_math/linear_alg.h"
 
 struct xd{
     int * p;
@@ -17,7 +18,7 @@ int& a_lamo(int& in, struct xd* _xd){
     return _xd->gg;
 }
 
-int main(){
+void t1(){
     int g = 6;
     int k = 3;
     struct xd _xd;
@@ -30,6 +31,15 @@ int main(){
     std::cout << "_xd.gg: " << _xd.gg << std::endl;
     std::cout << "_xd.p: " << _xd.p << std::endl;
     std::cout << "*_xd.p: " << *_xd.p << std::endl;
+}
+
+int main(){
+    CMatrix cmat;
+    // CVec cvec(100);
+    // CVec cvec2(100);
+
+    // if (cvec == cvec2) std::cout << "Nice vector!" << std::endl;
+    if (cmat.rows()==1 && cmat.cols()==1) std::cout << "Nice matrix!" << std::endl;
 
     return 0;
 }
