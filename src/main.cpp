@@ -3,6 +3,6 @@
 #include "backend.h"
 
 int main(){
-    do_execute();
+    welcome_message();
     return 0;
 }

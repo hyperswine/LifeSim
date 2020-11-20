@@ -1,5 +1,6 @@
 
 // Random number abstraction. 32-bits are enough for simulation
+// I don't like too many things in the header file so the variable names are usually removed for methods.
 #pragma once
 #include "hyper_math/rng_engine.h"
 #include "hyper_math/linear_alg.h"

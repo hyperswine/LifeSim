@@ -1,90 +1,71 @@
-#include <vector>
+// NOTE: maybe require types to be quadruples, in case of division by zero
 #include "md.h"
+#include "hyper_math/hypmath.h"
+#include "hyper_math/rng_engine.h"
+#include "hyper_math/linear_alg.h"
 #include <iostream>
 using namespace std;
 
-void do_execute(){
-    if(1 == 0){
-        throw -20;
-    }
-    std::cout << "Welcome to the Hyper Sim" << std::endl;
+void welcome_message(){
+    std::cout << "\n\t========================" << std::endl;
+    std::cout << "\t  Welcome to Hyper Sim" << std::endl;
+    std::cout << "\t========================" << std::endl;
 }
 
-vector<double> ele_addition(vector<double> a, vector<double> b) {
-    vector<double> new_vec;
-    for (int i = 0; i < a.size(); i++) {
-        new_vec[i] = a[i] + b[i];
-    }
-
-    return new_vec;
+// define one of our own energy functions
+// NOTE: should probably make a MD class with this method contaning RNG
+double c_pot_energy(CVec r, CVec v) {
+    RAND_ENG::RNG rng;
+    CVec u = rng.gen_randvec(r.len());
+    return (r + v) * u;
 }
 
 /**
- * Type = 0 for inner product (f: R^nxR^n -> R^1)
+ * LJ(r_i, r_j) = 4(1/d_ij^12 - 1/d_ij^6)
+ */ 
+double lj_potential(CVec r_i, CVec r_j){
+    double dist_ij = r_i | r_j;
+    double res = 4 * (1/pow(dist_ij,12) - 1/pow(dist_ij,6));
+
+    return res;
+}
+
+
+// Hyper-exponential space complexity for naive algorithm. O(n^2) time complexity. Would require writing to file if can't fit everything in memory
+
+// default [a, b] = [-1, 1]
+CMatrix naive_md(int n_particles, int n_timesteps, bool output_file);
+
+/** 
+ * Calculate the positions of all atoms over n timesteps, and returns a 3D tensor containing all positions of all atoms over the n timesteps
  */
-// double c_reduce(vector<double> vec1, vector<double> vec2, int type) {
-//     double prod = 0.0;
-//     for (int i = 0; i < vec1.size(); i++) {
-//         prod += (vec1[i] * vec2[i]);
-//     }
+CMatrix naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) {
+    RAND_ENG::RNG r_gen;
 
-//     return prod;
-// }
+    // Remember that these structures are completely overwritten at each atom iteration i
 
-// // define our own energy function
-// double energy_u(vector<double> r, vector<double> v) {
-//     vector<double> u;
-//     for (int i = 0; i < r.size(); i++) {
-//         u.push_back(rand());
-//     }
-    
-//     return c_reduce(ele_addition(r, v), u, 0);
-// }
+    ///////
+    //  INITIALIZE positions[0] to be random positions in some cubic lattic between [a, b]
+    ///////
 
-// // initialize a vector to random values between a range given a length
-// void init_vec(vector<vector<double>> &vec, int len, double a, double b) {
-//     random_device rd{};
-//     mt19937 gen{ rd() };
-//     uniform_real_distribution<double> dist;
+    CMatrix positions = r_gen.gen_randmatrix(n_particles, 3, a, b); // 3 -> (x, y, z) coordinates of space
+    CMatrix velocities = r_gen.gen_randmatrix(n_particles, 3, a, b);
+    CMatrix accelerations = r_gen.gen_randmatrix(n_particles, 3, a, b);
+    CVec potentials(n_particles);
+    CVec f(n_particles);
 
-//     for (int i = 0; i < len; i++) {
-//         vector<double> temp(3);
-//         vec.push_back(temp);
-//         for (int j = 0; j < 3; j++)
-//             vec[i][j] = (dist(gen));
-//     }
-// }
+    ///////////
+    //  CALCULATIONS of md for n timesteps
+    /////////
 
-// int main() {
-//     int n_steps = 1000;
-//     const int n_particles = 100;
-//     vector<vector<double>> r;
-//     vector<vector<double>> v;
-//     vector<vector<double>> a;
-//     vector<double> potentials; // same as below
-//     vector<double> f; // completely overwritten at each atom iteration 
+    for (int i = 0; i < n_timesteps; i++) {
+        for (int j = 0; j < n_particles; j++) {
+            // v[j] = integrate accelerations
+            // r[j] = integrate velocities
 
-//     init_vec(r, n_particles, 0, 100);
+            // potentials[j] = energy(r)
+        }
+    }
 
-//     for (int i = 0; i<n_particles; i++) {
-//         for (int j = 0; j<3; j++)
-//             cout << r[i][j] << endl;
-//     }
-//     //cout << energy_u() << endl;
-
-
-//     for (int i = 0; i < n_steps; i++) {
-//          for (int j = 0; j < n_particles; j++) {
-//              return 1;
-//              // v[j] = integrate accelerations
-//              // r[j] = integrate velocities
-
-//              // potentials[j] = energy(r)
-//          }
-//     }
-
-//     // local search energy estimation
-
-//     return 0;
-
-// }
+    return CMatrix(1, 1);
+}

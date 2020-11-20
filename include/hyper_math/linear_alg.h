@@ -9,14 +9,15 @@ const int TOO_LARGE = -3;
 const int MEMORY_ERROR = -4;
 const int INVALID_OP = -5;
 
-// we should not be storing anything more than this value in a vector
+// Arbitrary Limit: we should not be storing anything more than this value in a vector
+// May have to adjust depending on practice
 const int dbl_stack = 50000;
 const int DEFAULT_THREADS = 16;
 
 class CVec;
 class CMatrix;
 
-// vector of double-precision elements
+// Vector of double-precision elements
 class CVec{
 private:
     size_t cur_size;
@@ -31,16 +32,17 @@ public:
     CVec(const CVec&);
     ~CVec();
 
+    double* begin(){return vec;}
+    double* end(){return vec + cur_size;}
+
     void transpose(); //column_vec -> set to opposite
     int len() const;
-    // size_t& resize(); //how to do this? Just use the below for now.
-    // e.g. cvec.resize(4) -> cvec becomes length 4.
     void resize(int);
     void print_vec();
 
     // vector indexer. values are assignable.
     double& operator[](int i) const; //array access -> supports negative indexes
-    void operator=(double*); // assign to a new array
+    void operator=(double*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.
     void operator=(CVec& oth_vec); // move that vector's memory to this one
     bool operator!=(const CVec&) const;
     bool operator==(const CVec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
@@ -49,13 +51,14 @@ public:
     CVec operator/(const CVec&); //elementwise division
     double operator*(const CVec&); //inner product
     CMatrix operator&(const CVec&); //tensor (outer) product
+    double operator|(const CVec&); // distance between this vector and the other one.
 };
 
 enum matrix_mult_types{
     parallel, strassen, randomized
 };
 
-// basically 2D-array with relevant features
+// Basically 2D-array with relevant features
 class CMatrix{
 private:
     int n;
@@ -86,24 +89,43 @@ public:
     // OPERATORS
     /////////////
 
-    // double operator[](CVec v); // matrix access m[i, j] for ith row, jth column
     bool operator==(const CMatrix&);
     CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
     CMatrix operator&(const CMatrix&); // tensor product/kronecker product
     CVec& operator[](int i) const; // get the ith row (transposed vector)
-    // void operator[](int i); // assign to ith row
 
     ///////////////////////////////////
     // ENHANCED MULTIPLICATION METHODS
     ///////////////////////////////////
 
     // abstraction to choose a multiplication algorithm
-    CMatrix matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg);
+    CMatrix matrix_multiply(const CMatrix& m2, matrix_mult_types mult_alg);
     // p -> number of threads to use[]
-    CMatrix parallel_multiply(CMatrix&, int p);
+    CMatrix parallel_multiply(const CMatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    CMatrix strassen_multiply(CMatrix&);
+    CMatrix strassen_multiply(const CMatrix&);
     // multiply the matrices in monte-carlo style
-    CMatrix mc_multiply(CMatrix&);
+    CMatrix mc_multiply(const CMatrix&);
 
 };
+
+
+// A '3D' tensor. Analogous to a three-dimensional list
+// We separate tensors into vectors, matrices and 3d tensors only. For our purposes, higher dimensional tensors are probably unnecessary.
+// class CTensor3D{
+// private:
+//     CMatrix* tensor3d;
+
+// public:
+//     CTensor3D();
+//     // specify length, width, depth - how many matrices
+//     CTensor3D(int, int, int);
+//     ~CTensor3D();
+
+//     void print_tensor();
+//     int rows();
+//     int cols();
+//     int depth();
+
+//     CMatrix& operator[](int);
+// };

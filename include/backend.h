@@ -1,3 +1,2 @@
-// Included by Vizr frontend.
-// Defines all functions to be used
+// Included by Vizr frontend. Declares all functions to be used
 #pragma once

@@ -7,6 +7,8 @@
 #define move_x(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
 #define size_eq(vec1, vec2) (vec1.len() == vec2.len())
 
+#define op_vec(operate) if(len() != oth_vec.len()) return false; CVec res(len()); for(int i=0; i<len(); i++) res[i] = vec[i] operate oth_vec[i]; return res;
+
 CVec::CVec(){
     vec = new double[1];
     zero_vec(vec, 1);
@@ -103,59 +105,43 @@ void CVec::operator=(CVec& oth_vec){
     // be sure that this works -> should work since double is primitive & only one level of pointer
     memmove(vec, oth_vec.vec, cur_size*sizeof (double));
 }
-// TODO: these operators are basically repeated code -> use a macro for them.
+// elementwise addition
 CVec CVec::operator+(const CVec& oth_vec){
-    if(len() != oth_vec.len()) return false;
-
-    // elementwise division
-    CVec res(len());
-
-    for(int i=0; i<len(); i++)
-        res[i] = vec[i] + oth_vec[i];
-
-    return res;
+    op_vec(+)
 }
+// elementwise subtraction
 CVec CVec::operator-(const CVec& oth_vec){
-    if(len() != oth_vec.len()) return false;
-
-    // elementwise division
-    CVec res(len());
-
-    for(int i=0; i<len(); i++)
-        res[i] = vec[i] - oth_vec[i];
-
-    return res;
+    op_vec(-)
 }
+// elementwise division
 CVec CVec::operator/(const CVec& oth_vec){
-    if(len() != oth_vec.len()) return false;
-
-    // elementwise division
-    CVec res(len());
-
-    for(int i=0; i<len(); i++)
-        res[i] = vec[i] / oth_vec[i];
-
-    return res;
+    op_vec(/)
 }
+// compute dot product
 double CVec::operator*(const CVec& oth_vec){
     if(len() != oth_vec.len()) return false;
 
-    // compute dot product
     double scalar_sum = 0;
-    for(int i=0; i<len(); i++)
-        scalar_sum += vec[i] * oth_vec[i];
+    for(int i=0; i<len(); i++) scalar_sum += vec[i] * oth_vec[i];
 
     return 0;
 }
 CMatrix CVec::operator&(const CVec& oth_vec){
     CMatrix res(cur_size, oth_vec.len());
-    for(int i=0; i<cur_size; i++){
-        for(int j=0; j<oth_vec.len(); j++){
+    for(int i=0; i<cur_size; i++)
+        for(int j=0; j<oth_vec.len(); j++)
             res[i][j] = vec[i] * oth_vec[j];
-        }
-    }
-    
+        
     return res;
+}
+// distance between this vec and another vec. Works for opposite transposed vectors as well.
+double CVec::operator|(const CVec& oth_vec){
+    if(cur_size != oth_vec.len()) throw INVALID_OP;
+
+    double dist = 0;
+    for(int i=0; i<cur_size; i++) dist += pow((vec[i]-oth_vec[i]), 2);
+    
+    return sqrt(dist);
 }
 
 void CVec::resize(int new_size){
@@ -306,11 +292,9 @@ CVec& CMatrix::operator[](int i) const{
     return matrix[indexer];
 }
 
-CMatrix CMatrix::matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_alg){
+CMatrix CMatrix::matrix_multiply(const CMatrix& m2, matrix_mult_types mult_alg){
     // ensure that m1 and m2 are the right dimensions
-    CVec d1 = m1.get_dimensions();
-    CVec d2 = m2.get_dimensions();
-    if (d1[1] != d2[0]) throw UNSYMMETRIC_SIZE;    
+    if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;    
 
     // choose a multiplication method
     if (mult_alg == strassen){
@@ -323,14 +307,14 @@ CMatrix CMatrix::matrix_multiply(CMatrix m1, CMatrix m2, matrix_mult_types mult_
         return parallel_multiply(m2, DEFAULT_THREADS);
     }
     else{
-        return m1 * m2;
+        return *this * m2;
     }
 
 }
 
 // MULTIPLICATION ALGORITHMS
 
-CMatrix CMatrix::parallel_multiply(CMatrix& m2, int p){
+CMatrix CMatrix::parallel_multiply(const CMatrix& m2, int p){
     CMatrix res(cols(), m2.rows());
     // set threads = p
 
@@ -339,7 +323,7 @@ CMatrix CMatrix::parallel_multiply(CMatrix& m2, int p){
     return res;
 }
 
-CMatrix CMatrix::strassen_multiply(CMatrix& m2){
+CMatrix CMatrix::strassen_multiply(const CMatrix& m2){
     CMatrix res(cols(), m2.rows());
 
     // divide and conquer
@@ -347,7 +331,7 @@ CMatrix CMatrix::strassen_multiply(CMatrix& m2){
     return res;
 }
 
-CMatrix CMatrix::mc_multiply(CMatrix& m2){
+CMatrix CMatrix::mc_multiply(const CMatrix& m2){
     CMatrix res(cols(), m2.rows());
 
     // randomized

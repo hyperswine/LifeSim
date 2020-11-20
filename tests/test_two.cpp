@@ -16,7 +16,6 @@ struct xd{
 
 int& a_lamo(int& in, struct xd* _xd){
     in = 5;
-    
     return _xd->gg;
 }
 
@@ -45,20 +44,6 @@ void t2(){
     if (cmat.rows()==1 && cmat.cols()==1) std::cout << "Nice matrix!" << std::endl;
     if (cmat[0][0] == 0) std::cout << "Very nice matrix!" << std::endl;
 }
-
-// print current matrix
-// void print_cmatrix(CMatrix& m){
-//     // print each row, line by line
-//     std::cout<< "===Matrix:" << m.rows() << "x" << m.cols() << "====" << std::endl;
-//     for(int i=0; i<m.rows(); i++){
-//         for(int j=0; j<m.cols(); j++){
-//             std::cout << " " << m[i][j]; 
-//         }
-//         // end line
-//         std::cout << "\n";
-//     }
-//     std::cout<< "------END Matrix" << std::endl;
-// }
 
 void t3(){
     CMatrix cmat1(10, 10);
@@ -101,7 +86,7 @@ void t5(){
     std::cout << "main() -> int generated: " << y << std::endl;
 }
 
-int main(){
+void t6(){
     RAND_ENG::RNG rng;
 
     CVec cv1 = rng.gen_randvec(10);
@@ -150,7 +135,17 @@ int main(){
     {
         std::cerr << "caught! exception code: " << x << '\n';
     }
+}
+
+int main(){
+    RAND_ENG::RNG rng;
+    CVec cv1 = rng.gen_randvec(10);
+    CVec cv2 = rng.gen_randvec(10);
+    cv1.print_vec();
+    cv2.print_vec();
     
+    CVec cv3 = cv1 + cv2;
+    cv3.print_vec();
 
     return 0;
 }

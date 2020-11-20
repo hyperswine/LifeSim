@@ -11,4 +11,6 @@ add_subdirectory(tests)
 add_subdirectory(googletest_lib)
 # add the lib subdirectories here
 
+# NOTE: FLTK cannot be linked well
+
 target_link_libraries(hypersim hypmath)
