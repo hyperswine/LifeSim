@@ -3,6 +3,8 @@
 // since we're dealing in a physics context
 
 #pragma once
+#include "hyper_math/hypmath.h"
+
 const int OUT_OF_BOUNDS = -1;
 const int UNSYMMETRIC_SIZE = -2;
 const int TOO_LARGE = -3;
@@ -17,11 +19,11 @@ const int DEFAULT_THREADS = 16;
 class CVec;
 class CMatrix;
 
-// Vector of double-precision elements
+// Vector of quadruple-precision (128bit) elements
 class CVec{
 private:
     size_t cur_size;
-    double* vec;
+    quadruple* vec;
     bool column_vec;
 public:
     CVec();
@@ -32,8 +34,8 @@ public:
     CVec(const CVec&);
     ~CVec();
 
-    double* begin(){return vec;}
-    double* end(){return vec + cur_size;}
+    quadruple* begin(){return vec;}
+    quadruple* end(){return vec + cur_size;}
 
     void transpose(); //column_vec -> set to opposite
     int len() const;
@@ -41,17 +43,18 @@ public:
     void print_vec();
 
     // vector indexer. values are assignable.
-    double& operator[](int i) const; //array access -> supports negative indexes
-    void operator=(double*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.
+    quadruple& operator[](int i) const; //array access -> supports negative indexes
+    void operator=(quadruple*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.
     void operator=(CVec& oth_vec); // move that vector's memory to this one
     bool operator!=(const CVec&) const;
     bool operator==(const CVec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
     CVec operator+(const CVec&); //elementwise addition
     CVec operator-(const CVec&); //elementwise subtraction
     CVec operator/(const CVec&); //elementwise division
-    double operator*(const CVec&); //inner product
+    quadruple operator*(const CVec&); //inner product
+    CVec operator*(const quadruple); //elementwise multiplication
     CMatrix operator&(const CVec&); //tensor (outer) product
-    double operator|(const CVec&); // distance between this vector and the other one.
+    quadruple operator|(const CVec&); // distance between this vector and the other one.
 };
 
 enum matrix_mult_types{
@@ -82,7 +85,7 @@ public:
     void transpose(); // note that conjugate transpose of real is just transpose
     CVec get_dimensions();
     CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
-    void replace(CVec v, double); // assign to m[i, j] a double
+    void replace(CVec v, quadruple); // assign to m[i, j] a quadruple
     void print_matrix();
 
     /////////////

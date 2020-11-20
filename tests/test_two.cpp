@@ -61,7 +61,7 @@ void t4(){
     CVec cv(10);
     CVec cv2(10);
 
-    double* x = new double[10];
+    quadruple* x = new quadruple[10];
     for(int i=0; i<10; i++) x[i] = 0.5 + i;
     cv = x;
 
@@ -79,7 +79,7 @@ void f1(RAND_ENG::RNG& rng){
 void t5(){
     using namespace RAND_ENG;
     RNG rng_d;
-    double x = rng_d.gen_double(10, 20);
+    quadruple x = rng_d.gen_quad(10, 20);
     int y = rng_d.gen_int(10, 20);
 
     std::cout << "main() -> double generated: " << x << std::endl;
@@ -145,6 +145,9 @@ int main(){
     cv2.print_vec();
     
     CVec cv3 = cv1 + cv2;
+    cv3.print_vec();
+
+    cv3.transpose();
     cv3.print_vec();
 
     return 0;

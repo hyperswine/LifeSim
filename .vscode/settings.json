@@ -72,5 +72,9 @@
         "xloctime": "cpp",
         "xstddef": "cpp",
         "Enumerations.H": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "timestep",
+        "verlet"
+    ]
 }

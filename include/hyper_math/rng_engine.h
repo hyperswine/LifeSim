@@ -32,8 +32,8 @@ public:
 
     int gen_int();
     int gen_int(int, int);
-    double gen_double(int, int);
-    double gen_small_double();
+    quadruple gen_quad(int, int);
+    quadruple gen_small_quad();
 
     ///////////////////////////////
     //  VECTOR & MATRIX GENERATION

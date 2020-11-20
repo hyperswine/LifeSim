@@ -26,18 +26,18 @@ void RNG::set_seed(int seed){
     _seed = seed;
 }
 
-// generate a double between [a, b]
-double RNG::gen_double(int a, int b){
+// generate a quadruple between [a, b]
+quadruple RNG::gen_quad(int a, int b){
     using namespace std;
-    std::uniform_real_distribution<double> dist(a, b);
+    std::uniform_real_distribution<quadruple> dist(a, b);
 
     return dist(generator);
 }
 
-// generates a very small double between 0-1, usually skewed towards 0
-double RNG::gen_small_double(){
+// generates a very small quadruple between 0-1, usually skewed towards 0
+quadruple RNG::gen_small_quad(){
     // generate an int, then return inverse
-    return (double) 1 / generator();
+    return (quadruple) 1 / generator();
 }
 
 // generates an int between 0-2.14b

@@ -1,16 +1,17 @@
 #include "hyper_math/linear_alg.h"
+#include "hyper_math/hypmath.h"
 #include <any>
 #include <math.h>
 #include <iostream>
 
-#define zero_vec(x, n) memset(x, 0, n*sizeof (double))
+#define zero_vec(x, n) memset(x, 0, n*sizeof (quadruple))
 #define move_x(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
 #define size_eq(vec1, vec2) (vec1.len() == vec2.len())
 
 #define op_vec(operate) if(len() != oth_vec.len()) return false; CVec res(len()); for(int i=0; i<len(); i++) res[i] = vec[i] operate oth_vec[i]; return res;
 
 CVec::CVec(){
-    vec = new double[1];
+    vec = new quadruple[1];
     zero_vec(vec, 1);
     cur_size = 1;
     column_vec = true;
@@ -19,7 +20,7 @@ CVec::CVec(){
 // create a new vector (max size = dbl_stack -> 50,000 elements)
 CVec::CVec(int n){
     if (n > dbl_stack) throw TOO_LARGE;
-    vec = new double[n];
+    vec = new quadruple[n];
     zero_vec(vec, n);
 
     cur_size = n;
@@ -28,7 +29,7 @@ CVec::CVec(int n){
 
 CVec::CVec(int n, bool col_vec){
     if (n > dbl_stack) throw TOO_LARGE;
-    vec = new double[n];
+    vec = new quadruple[n];
     zero_vec(vec, n);
 
     cur_size = n;
@@ -39,10 +40,10 @@ CVec::CVec(const CVec& copy_from){
     // initialize this object as the object we want
     column_vec = copy_from.column_vec;
     cur_size  = copy_from.len();
-    vec = new double[cur_size];
+    vec = new quadruple[cur_size];
     
-    // be sure that this works -> should work since double is primitive & only one level of pointer
-    memmove(vec, copy_from.vec, cur_size*sizeof (double));
+    // be sure that this works -> should work since quadruple is primitive & only one level of pointer
+    memmove(vec, copy_from.vec, cur_size*sizeof (quadruple));
 }
 
 CVec::~CVec(){
@@ -73,7 +74,7 @@ void CVec::print_vec(){
 }
 
 // assume that an index > size is a mistake. A negative index < -size = backward indexing.
-double& CVec::operator[](int i) const{
+quadruple& CVec::operator[](int i) const{
     // out of bounds vector access
     if(abs(i) >= len()) throw OUT_OF_BOUNDS;
 
@@ -92,7 +93,7 @@ bool CVec::operator==(const CVec& oth_vec) const{
 }
 // WARNING: only works if you've dynamically allocated the new_arr and is same length
 // Would be fatal if not.
-void CVec::operator=(double* new_arr){
+void CVec::operator=(quadruple* new_arr){
     // assign vec
     vec = new_arr;
 }
@@ -100,10 +101,10 @@ void CVec::operator=(CVec& oth_vec){
     // move the memory from oth_vec to this vec
     column_vec = oth_vec.column_vec;
     cur_size  = oth_vec.len();
-    vec = new double[cur_size];
+    vec = new quadruple[cur_size];
     
-    // be sure that this works -> should work since double is primitive & only one level of pointer
-    memmove(vec, oth_vec.vec, cur_size*sizeof (double));
+    // be sure that this works -> should work since quadruple is primitive & only one level of pointer
+    memmove(vec, oth_vec.vec, cur_size*sizeof (quadruple));
 }
 // elementwise addition
 CVec CVec::operator+(const CVec& oth_vec){
@@ -118,13 +119,19 @@ CVec CVec::operator/(const CVec& oth_vec){
     op_vec(/)
 }
 // compute dot product
-double CVec::operator*(const CVec& oth_vec){
+quadruple CVec::operator*(const CVec& oth_vec){
     if(len() != oth_vec.len()) return false;
 
-    double scalar_sum = 0;
+    quadruple scalar_sum = 0;
     for(int i=0; i<len(); i++) scalar_sum += vec[i] * oth_vec[i];
 
     return 0;
+}
+// elementwise multiplication
+CVec CVec::operator*(const quadruple m){
+    CVec res(cur_size);
+    for(int i=0; i<cur_size; i++) res[i] *= m;
+    return res;
 }
 CMatrix CVec::operator&(const CVec& oth_vec){
     CMatrix res(cur_size, oth_vec.len());
@@ -135,10 +142,10 @@ CMatrix CVec::operator&(const CVec& oth_vec){
     return res;
 }
 // distance between this vec and another vec. Works for opposite transposed vectors as well.
-double CVec::operator|(const CVec& oth_vec){
+quadruple CVec::operator|(const CVec& oth_vec){
     if(cur_size != oth_vec.len()) throw INVALID_OP;
 
-    double dist = 0;
+    quadruple dist = 0;
     for(int i=0; i<cur_size; i++) dist += pow((vec[i]-oth_vec[i]), 2);
     
     return sqrt(dist);
@@ -146,7 +153,7 @@ double CVec::operator|(const CVec& oth_vec){
 
 void CVec::resize(int new_size){
     if(new_size <= 0 || new_size > dbl_stack) throw INVALID_OP;
-    double* new_vec = new double[new_size];
+    quadruple* new_vec = new quadruple[new_size];
 
     // if new len > cur_size, append zeros (memset new_len-cur_size)
     if(new_size > cur_size){
@@ -262,7 +269,7 @@ CMatrix CMatrix::operator&(const CMatrix& m2){
                 // q starts from j*m2.cols...j*m2.cols+m2.cols
                 for(int q=j*m2.cols(); q<j*m2.cols()+m2.cols(); q++){
                     // compute the element a_ij * b_ij
-                    double elem = matrix[i][j] * m2[i][j];
+                    quadruple elem = matrix[i][j] * m2[i][j];
                     // assign to p, q
                     res[p][q] = elem;
                 }
