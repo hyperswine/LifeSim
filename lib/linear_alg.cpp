@@ -7,6 +7,8 @@
 #define zero_vec(x, n) memset(x, 0, n*sizeof (quadruple))
 #define move_x(vec1, vec2) memmove(vec2, vec1, sizeof vec2)
 #define size_eq(vec1, vec2) (vec1.len() == vec2.len())
+#define max_dimension(a, b) (a > b)? a: b
+#define max2_dimension(a, b, c, d) max_dimension(a, b) > max_dimension(c, d) ? max_dimension(a, b) : max_dimension(c, d)
 
 #define op_vec(operate) if(len() != oth_vec.len()) return false; CVec res(len()); for(int i=0; i<len(); i++) res[i] = vec[i] operate oth_vec[i]; return res;
 
@@ -247,6 +249,107 @@ void CMatrix::transpose(){
     }
 }
 
+// if matrix isn't square, there will be problems
+cquad<CMatrix> CMatrix::div_quadrants(){
+    cquad<CMatrix> res(CMatrix, CMatrix, CMatrix, CMatrix);
+    // TODO: divide matrix into 4 chunks and return them
+
+    return res;
+}
+
+// append m2 to m1 from a direction
+// NOTE: m1 & m2 must have the same side equal for which you want to append to
+// m1 & m2 can have different adjacent sides.
+CMatrix CMatrix::append(CMatrix& m2, append_direction direction){
+
+    switch (direction){
+    case right_d:{
+        if(rows() != m2.rows()) throw INVALID_OP;
+        CMatrix res(rows(), cols() + m2.cols());
+        // copy m1 on the left
+        for(int i=0; i<rows(); i++){
+            for(int j=0; j<cols(); j++){
+                res[i][j] = matrix[i][j];
+            }
+        }
+        // copy m2 on the right
+        for(int i=0; i<rows(); i++){
+            for(int j=cols(); j<cols() + m2.cols(); j++){
+                res[i][j] = m2[i][j];
+            }
+        }
+        return res;
+        break;
+    }
+
+    case left_d:{
+        if(rows() != m2.rows()) throw INVALID_OP;
+
+        CMatrix res(rows(), cols() + m2.cols());
+        // copy m2 on the left
+        for(int i=0; i<rows(); i++){
+            for(int j=0; j<m2.cols(); j++){
+                res[i][j] = m2[i][j];
+            }
+        }
+        // copy m1 on the right
+        for(int i=0; i<rows(); i++){
+            for(int j=m2.cols(); j<cols() + m2.cols(); j++){
+                res[i][j] = matrix[i][j];
+            }
+        }
+        return res;
+        break;
+    }
+
+    case lower_d:{
+        if(cols() != m2.cols()) throw INVALID_OP;
+
+        CMatrix res(rows() + m2.rows(), cols());
+        // copy m1 on the upper
+        for(int i=0; i<rows(); i++){
+            for(int j=0; j<cols(); j++){
+                res[i][j] = matrix[i][j];
+            }
+        }
+        // copy m2 on the lower
+        for(int i=rows(); i<rows() + m2.rows(); i++){
+            for(int j=0; j<cols(); j++){
+                res[i][j] = m2[i][j];
+            }
+        }
+        return res;
+        break;
+    } 
+
+    case upper_d:{
+        if(cols() != m2.cols()) throw INVALID_OP;
+
+        CMatrix res(rows() + m2.rows(), cols());
+        // copy m1 on the lower
+        for(int i=m2.rows(); i<rows() + m2.rows(); i++){
+            for(int j=0; j<cols(); j++){
+                res[i][j] = matrix[i][j];
+            }
+        }
+        // copy m2 on the upper
+        for(int i=0; i<m2.rows(); i++){
+            for(int j=0; j<cols(); j++){
+                res[i][j] = m2[i][j];
+            }
+        }
+        return res;
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    // this shouldn't happen
+    return CMatrix();
+}
+
 CMatrix CMatrix::operator*(const CMatrix& m2){
     if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;
 
@@ -290,7 +393,6 @@ bool CMatrix::operator==(const CMatrix& m2){
 
     return true;
 }
-
 // don't have to worry about indexing m, since handled by cvec
 CVec& CMatrix::operator[](int i) const{
     if(abs(i) >= n) throw OUT_OF_BOUNDS;
@@ -298,8 +400,30 @@ CVec& CMatrix::operator[](int i) const{
     int indexer = i % n;
     return matrix[indexer];
 }
+CMatrix CMatrix::operator-(const CMatrix& m2){
+    if(rows() != m2.rows() && cols() != m2.cols()) throw INVALID_OP;
 
-CMatrix CMatrix::matrix_multiply(const CMatrix& m2, matrix_mult_types mult_alg){
+    CMatrix res(rows(), cols());
+
+    for(int i=0; i<rows(); i++)
+        for(int j=0; j<cols(); j++)
+            res[i][j] = matrix[i][j] - m2[i][j];
+
+    return res;
+}
+CMatrix CMatrix::operator+(const CMatrix& m2){
+    if(rows() != m2.rows() && cols() != m2.cols()) throw INVALID_OP;
+
+    CMatrix res(rows(), cols());
+
+    for(int i=0; i<rows(); i++)
+        for(int j=0; j<cols(); j++)
+            res[i][j] = matrix[i][j] + m2[i][j];
+        
+    return res;
+}
+
+CMatrix CMatrix::matrix_multiply(CMatrix& m2, matrix_mult_types mult_alg){
     // ensure that m1 and m2 are the right dimensions
     if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;    
 
@@ -321,7 +445,7 @@ CMatrix CMatrix::matrix_multiply(const CMatrix& m2, matrix_mult_types mult_alg){
 
 // MULTIPLICATION ALGORITHMS
 
-CMatrix CMatrix::parallel_multiply(const CMatrix& m2, int p){
+CMatrix CMatrix::parallel_multiply(CMatrix& m2, int p){
     CMatrix res(cols(), m2.rows());
     // set threads = p
 
@@ -330,15 +454,55 @@ CMatrix CMatrix::parallel_multiply(const CMatrix& m2, int p){
     return res;
 }
 
-CMatrix CMatrix::strassen_multiply(const CMatrix& m2){
-    CMatrix res(cols(), m2.rows());
+/**
+ * Multiply two n x n matrices together
+ * NOTE: If attempting to multiply non square matrices, 0's will be auto appended to them,
+ * and a warning message will be displayed
+ */ 
+CMatrix CMatrix::strassen_multiply(CMatrix& m2){
+    // if matrices aren't both square and the same size
+    if(rows() != m2.rows() || cols() != m2.cols() || rows() != cols() || m2.rows() != m2.cols()){
+        std::cout << "Warning: multiplying non square matrices" << std::endl;
+        // resize matrix(s) to max_dim
+        int max_a = max_dimension(rows(), cols());
+        int max_b = max_dimension(m2.rows(), m2.cols());
+        int max_dim = max_dimension(max_a, max_b);
+        resize(max_dim, max_dim);
+        m2.resize(max_dim, max_dim);
+    }
 
-    // divide and conquer
+    // O(1) op, despite naive using naive matrix mult in base case
+    if(m2.rows()==1) return *this * m2;
 
-    return res;
+    // split m1 & m2 into 2 quarters
+    cquad<CMatrix> res1 = div_quadrants();
+    cquad<CMatrix> res2 = m2.div_quadrants();
+
+    // divide and conquer, 7 times.
+    // Note the 7 operations instead of 8 is what gives this algorithm its asymptotic bound
+    CMatrix r1 = res1[0].strassen_multiply(res2[1] - res2[2]);
+    CMatrix r2 = (res1[0] + res1[1]).strassen_multiply(res2[3]);
+    CMatrix r3 = (res1[2] + res1[3]).strassen_multiply(res2[0]);
+    CMatrix r4 = res1[3].strassen_multiply(res2[0] - res2[2]);
+    CMatrix r5 = (res1[0] + res1[3]).strassen_multiply(res2[0] + res2[3]);
+    CMatrix r6 = (res1[1] - res1[3]).strassen_multiply(res2[1] + res2[3]);
+    CMatrix r7 = (res1[0] - res1[2]).strassen_multiply(res2[0] + res2[1]);
+
+    CMatrix upper_left = r5 + r4 - r2 + r6;
+    CMatrix upper_right = r1 + r2;
+    CMatrix lower_left = r3 + r4;
+    CMatrix lower_right = r1 + r5 - r3 - r7;
+
+    // append matrices and return result
+    // NOTE: these appends can take up O(n^2). Simply 'adding' the two matrices together requires copying every element
+    // in most implementations, so in practice strassen algorithm is very flashy but not stack-friendly.
+    CMatrix upper = upper_left.append(upper_right, right_d);
+    CMatrix lower = lower_left.append(lower_right, right_d);
+
+    return upper.append(lower, lower_d);
 }
 
-CMatrix CMatrix::mc_multiply(const CMatrix& m2){
+CMatrix CMatrix::mc_multiply(CMatrix& m2){
     CMatrix res(cols(), m2.rows());
 
     // randomized

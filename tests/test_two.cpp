@@ -3,6 +3,7 @@
 #include <random>
 #include "hyper_math/linear_alg.h"
 #include "hyper_math/rng_engine.h"
+#include "hyper_math/hypmath.h"
 
 struct xd{
     int * p;
@@ -137,7 +138,7 @@ void t6(){
     }
 }
 
-int main(){
+void t7(){
     RAND_ENG::RNG rng;
     CVec cv1 = rng.gen_randvec(10);
     CVec cv2 = rng.gen_randvec(10);
@@ -149,6 +150,15 @@ int main(){
 
     cv3.transpose();
     cv3.print_vec();
+}
+
+int main(){
+    CVec cv1(10);
+    CVec cv2(10);
+    cpair<CVec> res(cv1, cv2);
+
+    res[0].print_vec();
+    res[1].print_vec();
 
     return 0;
 }

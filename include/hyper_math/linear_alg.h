@@ -61,6 +61,11 @@ enum matrix_mult_types{
     parallel, strassen, randomized
 };
 
+// for appending matrices
+enum append_direction{
+    left_d, right_d, upper_d, lower_d
+};
+
 // Basically 2D-array with relevant features
 class CMatrix{
 private:
@@ -87,6 +92,11 @@ public:
     CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
     void replace(CVec v, quadruple); // assign to m[i, j] a quadruple
     void print_matrix();
+    // divide matrix into quadrants
+    cquad<CMatrix> div_quadrants();
+    void resize(int, int);
+    // return the result of appending a matrix to the current one, in 4 possible directions
+    CMatrix append(CMatrix&, append_direction);
 
     /////////////
     // OPERATORS
@@ -96,19 +106,21 @@ public:
     CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
     CMatrix operator&(const CMatrix&); // tensor product/kronecker product
     CVec& operator[](int i) const; // get the ith row (transposed vector)
+    CMatrix operator-(const CMatrix&); // elementwise subtraction
+    CMatrix operator+(const CMatrix&); // elementwise addition
 
     ///////////////////////////////////
     // ENHANCED MULTIPLICATION METHODS
     ///////////////////////////////////
 
     // abstraction to choose a multiplication algorithm
-    CMatrix matrix_multiply(const CMatrix& m2, matrix_mult_types mult_alg);
+    CMatrix matrix_multiply(CMatrix& m2, matrix_mult_types mult_alg);
     // p -> number of threads to use[]
-    CMatrix parallel_multiply(const CMatrix&, int p);
+    CMatrix parallel_multiply(CMatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    CMatrix strassen_multiply(const CMatrix&);
+    CMatrix strassen_multiply(CMatrix&);
     // multiply the matrices in monte-carlo style
-    CMatrix mc_multiply(const CMatrix&);
+    CMatrix mc_multiply(CMatrix&);
 
 };
 

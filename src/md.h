@@ -16,7 +16,7 @@ quadruple local_search();
 
 // The verlet integration method uses 3rd order taylor expansions (error in the order of del^4)
 // We use this function at every timestep to find the positions 
-// In - positions & velocities of a particle i, at some timestep 0 <= t < n_timesteps
+// In - prev, current positions & velocities of a particle i, at some timestep 0 <= t < n_timesteps
 cpair<CVec> verlet_integration(CVec&, CVec&, CVec&, quadruple);
 
 /**

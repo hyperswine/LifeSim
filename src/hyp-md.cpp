@@ -21,7 +21,7 @@ cpair<CVec> verlet_integration(CVec& r_prev, CVec& r_i, CVec& v_i, quadruple del
     CVec r_next(r_i.len());
     CVec v_next(v_i.len());
 
-    // TODO: compute accelerations using a potential function
+    // TODO: compute accelerations by computing force potentials then taking the negative partial derivative
     CVec a_i(r_i.len());
 
     r_next = r_i*2 + r_prev + a_i * pow(delta,2);
@@ -49,6 +49,21 @@ quadruple lj_potential(CVec r_i, CVec r_j, quadruple eps, quadruple sigma){
 // eps = 3.4e-8, sigma = 1.7e-14,
 quadruple argon_pot(CVec r_i, CVec r_j){
     return lj_potential(r_i, r_j, argon_eps, argon_sigma);
+}
+
+// compute total forces from all particles, which is basically the sum of their potential functions
+// can think of it as the entire potential energy of the system
+quadruple force_potential(CMatrix pos, int index){
+    // for a given position to other all positions, compute potential(pos(i), pos(i+1..N))
+    quadruple accum_v;
+    for(int i=0; i<pos.rows()-2; i++){
+        for(int j=i+1; j<pos.cols()-1; j++){
+            // accumulate potential(pos(i), pos(j))
+            accum_v += argon_pot(pos[i], pos[j]);
+        }
+    }
+
+    return accum_v;
 }
 
 
