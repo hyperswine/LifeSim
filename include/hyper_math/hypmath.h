@@ -2,6 +2,14 @@
 #pragma once
 
 typedef long double quadruple;
+#define c_pi 3.141592653589793238462643383279502884L
+
+// factorial -> 20! limit
+long int fact(const int& x);
+
+// trig functions based on taylor series expansion of 10 terms
+quadruple c_sin(quadruple);
+quadruple c_cos(quadruple);
 
 template <class T> class cpair{
 private:

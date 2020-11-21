@@ -81,8 +81,14 @@ void CVec::print_vec(){
     std::cout << "==End vector\n" << std::endl;
 }
 
+quadruple& CVec::operator[](int& i) const{
+    if(abs(i) >= cur_size) throw OUT_OF_BOUNDS;
+
+    size_t indexer = i % cur_size;
+    return vec[indexer];
+}
 // assume that an index > size is a mistake. A negative index < -size = backward indexing.
-quadruple& CVec::operator[](int i) const{
+quadruple& CVec::operator[](int&& i) const{
     // out of bounds vector access
     if(abs(i) >= cur_size) throw OUT_OF_BOUNDS;
 
@@ -428,6 +434,13 @@ CMatrix CMatrix::append(CMatrix& m2, append_direction direction){
     return CMatrix();
 }
 
+CVec& CMatrix::operator[](int& i) const{
+    if(abs(i) >= n) throw OUT_OF_BOUNDS;
+
+    int indexer = i % n;
+    return matrix[indexer];
+}
+
 CMatrix CMatrix::operator*(const CMatrix& m2){
     if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;
 
@@ -472,7 +485,7 @@ bool CMatrix::operator==(const CMatrix& m2){
     return true;
 }
 // don't have to worry about indexing m, since handled by cvec
-CVec& CMatrix::operator[](int i) const{
+CVec& CMatrix::operator[](int&& i) const{
     if(abs(i) >= n) throw OUT_OF_BOUNDS;
 
     int indexer = i % n;

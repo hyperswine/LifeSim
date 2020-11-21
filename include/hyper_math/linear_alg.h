@@ -43,7 +43,8 @@ public:
     void print_vec();
 
     // vector indexer. values are assignable.
-    quadruple& operator[](int i) const; //array access -> supports negative indexes
+    quadruple& operator[](int& i) const;
+    quadruple& operator[](int&& i) const; //array access -> supports negative indexes
     void operator=(quadruple*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.
     void operator=(CVec& oth_vec); // move that vector's memory to this one
     bool operator!=(const CVec&) const;
@@ -105,7 +106,8 @@ public:
     bool operator==(const CMatrix&);
     CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
     CMatrix operator&(const CMatrix&); // tensor product/kronecker product
-    CVec& operator[](int i) const; // get the ith row (transposed vector)
+    CVec& operator[](int& i) const;
+    CVec& operator[](int&& i) const; // get the ith row (transposed vector)
     CMatrix operator-(const CMatrix&); // elementwise subtraction
     CMatrix operator+(const CMatrix&); // elementwise addition
 

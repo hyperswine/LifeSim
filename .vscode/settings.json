@@ -75,6 +75,7 @@
         "cstdarg": "cpp"
     },
     "cSpell.words": [
+        "complexv",
         "timestep",
         "verlet"
     ]

@@ -4,6 +4,7 @@
 #include "hyper_math/linear_alg.h"
 #include "hyper_math/rng_engine.h"
 #include "hyper_math/hypmath.h"
+#include "hyper_math/complex_field.h"
 
 struct xd{
     int * p;
@@ -179,15 +180,16 @@ void t7(){
 
 int main(){
     RAND_ENG::RNG rng;
-    CMatrix cm1 = rng.gen_randmatrix(10, 10);
-    CMatrix cm2 = rng.gen_randmatrix(10, 10);
-    CMatrix cm3 = rng.gen_randmatrix(10, 10);
-    CMatrix cm4 = rng.gen_randmatrix(10, 10);
-    // cquad<CMatrix> cms(cm1, cm2, cm3, cm4);
-    // for(int i=0; i<4; i++){
-    //     // TODO: why tf doesnt this work??
-    //     cms[i].print_matrix();
-    // }
+    complexv c_v(c_pi);
+    c_v.print(); // note that double represents up to 15 sig figs. Quadruple -> 36 sig figs
+
+    t1();
+    t2();
+    t3();
+    t4();
+    t5();
+    t6();
+    t7();
 
     return 0;
 }
