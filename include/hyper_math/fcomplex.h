@@ -3,21 +3,22 @@
 #pragma once
 #include "hyper_math/hypmath.h"
 
+// complex number representation with doubles, to exploit exponentials
 class complexv{
 private:
-    quadruple a;
-    quadruple b;
+    double a;
+    double b;
 public:
     // numeric representation, a + ib
-    complexv(quadruple, quadruple);
+    complexv(double, double);
     // exponential representation, e^{i*theta}, where input = theta, e.g. pi
     // NOTE: theta is in radians. Do not use degrees!
-    complexv(quadruple);
+    complexv(double);
 
-    void set_re(quadruple);
-    void set_im(quadruple);
-    quadruple re() const;
-    quadruple im() const;
+    void set_re(double);
+    void set_im(double);
+    double re() const;
+    double im() const;
     void print() const;
 
     complexv operator+(const complexv&);
@@ -42,7 +43,7 @@ public:
     cv_vec(int);
     ~cv_vec();
 
-    quadruple operator*(const cv_vec&);
+    double operator*(const cv_vec&);
     complexv& operator[](int& i);
 };
 

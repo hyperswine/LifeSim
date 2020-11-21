@@ -16,23 +16,23 @@ const int INVALID_OP = -5;
 const int dbl_stack = 50000;
 const int DEFAULT_THREADS = 16;
 
-class CVec;
-class CMatrix;
+class qvec;
+class qmatrix;
 
 // Vector of quadruple-precision (128bit) elements
-class CVec{
+class qvec{
 private:
     size_t cur_size;
     quadruple* vec;
     bool column_vec;
 public:
-    CVec();
+    qvec();
     // creates a vector of size n with zeros
-    CVec(int); 
-    CVec(int, bool);
+    qvec(int); 
+    qvec(int, bool);
     // copy constructor
-    CVec(const CVec&);
-    ~CVec();
+    qvec(const qvec&);
+    ~qvec();
 
     quadruple* begin(){return vec;}
     quadruple* end(){return vec + cur_size;}
@@ -46,16 +46,16 @@ public:
     quadruple& operator[](int& i) const;
     quadruple& operator[](int&& i) const; //array access -> supports negative indexes
     void operator=(quadruple*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.
-    void operator=(CVec& oth_vec); // move that vector's memory to this one
-    bool operator!=(const CVec&) const;
-    bool operator==(const CVec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
-    CVec operator+(const CVec&); //elementwise addition
-    CVec operator-(const CVec&); //elementwise subtraction
-    CVec operator/(const CVec&); //elementwise division
-    quadruple operator*(const CVec&); //inner product
-    CVec operator*(const quadruple); //elementwise multiplication
-    CMatrix operator&(const CVec&); //tensor (outer) product
-    quadruple operator|(const CVec&); // distance between this vector and the other one.
+    void operator=(qvec& oth_vec); // move that vector's memory to this one
+    bool operator!=(const qvec&) const;
+    bool operator==(const qvec&) const; //elementwise comparison; if not the same size, return false. (throw exception instead?)
+    qvec operator+(const qvec&); //elementwise addition
+    qvec operator-(const qvec&); //elementwise subtraction
+    qvec operator/(const qvec&); //elementwise division
+    quadruple operator*(const qvec&); //inner product
+    qvec operator*(const quadruple); //elementwise multiplication
+    qmatrix operator&(const qvec&); //tensor (outer) product
+    quadruple operator|(const qvec&); // distance between this vector and the other one.
 };
 
 enum matrix_mult_types{
@@ -68,19 +68,19 @@ enum append_direction{
 };
 
 // Basically 2D-array with relevant features
-class CMatrix{
+class qmatrix{
 private:
     int n;
     int m;
-    CVec* matrix;
+    qvec* matrix;
 
 public:
-    // Default Constructor. Recommended to use CMatrix(n, m) instead.
+    // Default Constructor. Recommended to use qmatrix(n, m) instead.
     // Creates a 1x1 matrix of 0
-    CMatrix();
-    CMatrix(int n, int m);
-    CMatrix(const CMatrix&); // const reference means we cant reassign that reference to something else. But I think we can still change its internals unless we pass as a const X const.
-    ~CMatrix();
+    qmatrix();
+    qmatrix(int n, int m);
+    qmatrix(const qmatrix&); // const reference means we cant reassign that reference to something else. But I think we can still change its internals unless we pass as a const X const.
+    ~qmatrix();
     
     /////////////////////
     // USEFUL OPERATIONS
@@ -89,40 +89,40 @@ public:
     int rows() const;
     int cols() const;
     void transpose(); // note that conjugate transpose of real is just transpose
-    CVec get_dimensions();
-    CVec hyper_sum(CMatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
-    void replace(CVec v, quadruple); // assign to m[i, j] a quadruple
+    qvec get_dimensions();
+    qvec hyper_sum(qmatrix&); // special operation for 'hyper sum' -> sums all columns j of m2 and puts into new vector[j]
+    void replace(qvec v, quadruple); // assign to m[i, j] a quadruple
     void print_matrix();
     // divide matrix into quadrants
-    cquad<CMatrix> div_quadrants();
+    cquad<qmatrix> div_quadrants();
     void resize(int, int);
     // return the result of appending a matrix to the current one, in 4 possible directions
-    CMatrix append(CMatrix&, append_direction);
+    qmatrix append(qmatrix&, append_direction);
 
     /////////////
     // OPERATORS
     /////////////
 
-    bool operator==(const CMatrix&);
-    CMatrix operator*(const CMatrix&); // standard O(n^3) multiplication
-    CMatrix operator&(const CMatrix&); // tensor product/kronecker product
-    CVec& operator[](int& i) const;
-    CVec& operator[](int&& i) const; // get the ith row (transposed vector)
-    CMatrix operator-(const CMatrix&); // elementwise subtraction
-    CMatrix operator+(const CMatrix&); // elementwise addition
+    bool operator==(const qmatrix&);
+    qmatrix operator*(const qmatrix&); // standard O(n^3) multiplication
+    qmatrix operator&(const qmatrix&); // tensor product/kronecker product
+    qvec& operator[](int& i) const;
+    qvec& operator[](int&& i) const; // get the ith row (transposed vector)
+    qmatrix operator-(const qmatrix&); // elementwise subtraction
+    qmatrix operator+(const qmatrix&); // elementwise addition
 
     ///////////////////////////////////
     // ENHANCED MULTIPLICATION METHODS
     ///////////////////////////////////
 
     // abstraction to choose a multiplication algorithm
-    CMatrix matrix_multiply(CMatrix& m2, matrix_mult_types mult_alg);
+    qmatrix matrix_multiply(qmatrix& m2, matrix_mult_types mult_alg);
     // p -> number of threads to use[]
-    CMatrix parallel_multiply(CMatrix&, int p);
+    qmatrix parallel_multiply(qmatrix&, int p);
     // lower asymptotic bound multiplication (probably the slowest in practice) 
-    CMatrix strassen_multiply(CMatrix&);
+    qmatrix strassen_multiply(qmatrix&);
     // multiply the matrices in monte-carlo style
-    CMatrix mc_multiply(CMatrix&);
+    qmatrix mc_multiply(qmatrix&);
 
 };
 
@@ -131,7 +131,7 @@ public:
 // We separate tensors into vectors, matrices and 3d tensors only. For our purposes, higher dimensional tensors are probably unnecessary.
 // class CTensor3D{
 // private:
-//     CMatrix* tensor3d;
+//     qmatrix* tensor3d;
 
 // public:
 //     CTensor3D();
@@ -144,5 +144,5 @@ public:
 //     int cols();
 //     int depth();
 
-//     CMatrix& operator[](int);
+//     qmatrix& operator[](int);
 // };

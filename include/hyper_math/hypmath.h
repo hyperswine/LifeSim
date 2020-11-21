@@ -8,8 +8,8 @@ typedef long double quadruple;
 long int fact(const int& x);
 
 // trig functions based on taylor series expansion of 10 terms
-quadruple c_sin(quadruple);
-quadruple c_cos(quadruple);
+double c_sin(double);
+double c_cos(double);
 
 template <class T> class cpair{
 private:
@@ -50,6 +50,7 @@ public:
         delete[] _t;
     }
 
+    // the main selling point -> not going over array bounds
     T& operator[](int i){
         int indexer = i % 4;
         return _t[indexer];

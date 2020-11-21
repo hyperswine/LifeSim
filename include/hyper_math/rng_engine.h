@@ -3,7 +3,7 @@
 // I don't like too many things in the header file so the variable names are usually removed for methods.
 #pragma once
 #include "hyper_math/rng_engine.h"
-#include "hyper_math/linear_alg.h"
+#include "hyper_math/qtensor.h"
 #include <random>
 
 // specify generation method
@@ -41,11 +41,11 @@ public:
 
     // generate a vector of random values, length n
     // NOTE: the default options generate quite large numbers ~10^9
-    CVec gen_randvec(int);
-    CMatrix gen_randmatrix(int, int);
+    qvec gen_randvec(int);
+    qmatrix gen_randmatrix(int, int);
     // generate a vector of length n, with values between [a, b]
-    CVec gen_randvec(int, int, int);
-    CMatrix gen_randmatrix(int, int, int, int);
+    qvec gen_randvec(int, int, int);
+    qmatrix gen_randmatrix(int, int, int, int);
 
 };
 

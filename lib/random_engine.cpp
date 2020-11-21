@@ -1,5 +1,5 @@
 #include "hyper_math/rng_engine.h"
-#include "hyper_math/linear_alg.h"
+#include "hyper_math/qtensor.h"
 #include <chrono>
 
 using namespace RAND_ENG;
@@ -53,11 +53,11 @@ int RNG::gen_int(int a, int b){
     return dist(generator);
 }
 
-CVec RNG::gen_randvec(int length){
+qvec RNG::gen_randvec(int length){
     // make sure to use random device
     set_seed(USE_RD);
 
-    CVec res(length);
+    qvec res(length);
     for(int i=0; i<length; i++){
         res[i] = generator();
     }
@@ -65,10 +65,10 @@ CVec RNG::gen_randvec(int length){
     return res;
 }
 
-CVec RNG::gen_randvec(int length, int a, int b){
+qvec RNG::gen_randvec(int length, int a, int b){
     std::uniform_int_distribution dist(a, b);
 
-    CVec res(length);
+    qvec res(length);
     for(int i=0; i<length; i++){
         res[i] = dist(generator);
     }
@@ -76,10 +76,10 @@ CVec RNG::gen_randvec(int length, int a, int b){
     return res;
 }
 
-CMatrix RNG::gen_randmatrix(int n, int m){
+qmatrix RNG::gen_randmatrix(int n, int m){
     set_seed(USE_RD);
 
-    CMatrix res(n, m);
+    qmatrix res(n, m);
     for(int i=0; i<n; i++){
         for(int j=0; j<m; j++){
             res[i][j] = generator();
@@ -90,10 +90,10 @@ CMatrix RNG::gen_randmatrix(int n, int m){
 }
 
 // args (n, m, a, b)
-CMatrix RNG::gen_randmatrix(int n, int m, int a, int b){
+qmatrix RNG::gen_randmatrix(int n, int m, int a, int b){
     std::uniform_int_distribution dist(a, b);
 
-    CMatrix res(n, m);
+    qmatrix res(n, m);
     for(int i=0; i<n; i++){
         for(int j=0; j<m; j++){
             res[i][j] = dist(generator);

@@ -1,8 +1,5 @@
 // Here we demonstrate the integration method of randomized 'dart throwing' to approximate
 // the volume of an n-dimensional object.
-#include <vector>
-#include <math.h>
-#include <any>
 using namespace std;
 
 // const any _trig[3] = {sin, cos, tan};

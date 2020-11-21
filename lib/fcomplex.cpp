@@ -1,30 +1,30 @@
 // Definition of complex numbers and operations involving them.
 // cmath implements PI as a long double, so no need to redefine constants
-#include "hyper_math/complex_field.h"
+#include "hyper_math/fcomplex.h"
 #include <cmath>
 #include <iostream>
 
-complexv::complexv(quadruple x, quadruple y){
+complexv::complexv(double x, double y){
     a = x;
     b = y;
 }
 
-complexv::complexv(quadruple theta_rad){
+complexv::complexv(double theta_rad){
     // evaluate cos(theta_rad) + i*sin(theta_rad)
     a = cos(theta_rad);
     b = sin(theta_rad);
 }
 
-quadruple complexv::re() const{
+double complexv::re() const{
     return a;
 }
-quadruple complexv::im() const{
+double complexv::im() const{
     return b;
 }
-void complexv::set_re(quadruple x){
+void complexv::set_re(double x){
     a = x;
 }
-void complexv::set_im(quadruple y){
+void complexv::set_im(double y){
     b = y;
 }
 
@@ -44,8 +44,8 @@ complexv complexv::operator-(const complexv& c2){
 
 complexv complexv::operator*(const complexv& c2){
     // (a+bi)(x+yi) = ax - by + (ay + bx)i
-    quadruple new_a = (re() * c2.re()) - (im() * c2.im());
-    quadruple new_b = (re() * c2.im()) + (im() * c2.re());
+    double new_a = (re() * c2.re()) - (im() * c2.im());
+    double new_b = (re() * c2.im()) + (im() * c2.re());
 
     complexv res(new_a, new_b);
     return res;
@@ -53,9 +53,9 @@ complexv complexv::operator*(const complexv& c2){
 
 complexv complexv::operator/(const complexv& c2){
     // (a+bi)/(x+yi) = conjugate -> (ax+by)/(x^2 + y^2) + i(bx-ay)/(x^2 + y^2)
-    quadruple o_top = (re() * c2.re()) + (im() * c2.im());
-    quadruple t_top =  - (re() * c2.im()) + (im() * c2.re());
-    quadruple denom = pow(c2.re(),2) + pow(c2.im(),2);
+    double o_top = (re() * c2.re()) + (im() * c2.im());
+    double t_top =  - (re() * c2.im()) + (im() * c2.re());
+    double denom = pow(c2.re(),2) + pow(c2.im(),2);
 
     complexv res(o_top/denom, t_top/denom);
     return res;
