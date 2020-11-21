@@ -15,6 +15,7 @@ protected:
     signed int overall_score; // can be pos or neg
 
     // TODO: have function pointers
+    
 
     // TODO: have an implicit exception catcher, which catches all exceptions
     // but prints the exception and exits.

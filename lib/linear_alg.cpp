@@ -357,9 +357,11 @@ CMatrix CMatrix::append(CMatrix& m2, append_direction direction){
             }
         }
         // copy m2 on the right
+        // e.g. 10x10 -right-> 10x20 = 10x30
+        // 0..rows(), cols()..m2.cols() -translate-> 0..m2.cols()
         for(int i=0; i<rows(); i++){
             for(int j=cols(); j<cols() + m2.cols(); j++){
-                res[i][j] = m2[i][j];
+                res[i][j] = m2[i][cols() - j];
             }
         }
         return res;

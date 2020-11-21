@@ -180,16 +180,34 @@ void t7(){
 
 int main(){
     RAND_ENG::RNG rng;
-    complexv c_v(c_pi);
-    c_v.print(); // note that double represents up to 15 sig figs. Quadruple -> 36 sig figs
+    // complexv c_v(c_pi);
+    // c_v.print(); // note that double represents up to 15 sig figs. Quadruple -> 36 sig figs
 
-    t1();
-    t2();
-    t3();
-    t4();
-    t5();
-    t6();
-    t7();
+    // t1();
+    // t2();
+    // t3();
+    // t4();
+    // t5();
+    // t6();
+    // t7();
+
+    CMatrix cm_x1 = rng.gen_randmatrix(10, 10);
+    CMatrix cm_x2 = rng.gen_randmatrix(10, 20);
+    CMatrix cm_x1x2 = cm_x1.append(cm_x2, right_d);
+    cm_x1x2.print_matrix();
+
+    CMatrix cm_x3 = rng.gen_randmatrix(30, 20);
+    CMatrix cm_x4 = rng.gen_randmatrix(1, 1);
+    cquad<CMatrix> cq(cm_x1, cm_x2, cm_x3, cm_x4);
+
+    // for(int i=0; i<4; i++)
+    //     cq[i].print_matrix();
+    
+    // for(CMatrix cm: cq){
+    //     cm.print_matrix();
+    // }
+
+
 
     return 0;
 }

@@ -17,7 +17,7 @@ private:
     T y;
 
 public:
-    cpair(T a, T b){
+    cpair(T& a, T& b){
         x = a;
         y = b;
     }
@@ -39,7 +39,7 @@ private:
     T* _t;
 
 public:
-    cquad(T a, T b, T c, T d){
+    cquad(T& a, T& b, T& c, T& d){
         _t = new T[4];
         _t[0] = a;
         _t[1] = b;
