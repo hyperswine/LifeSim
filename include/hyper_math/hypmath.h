@@ -42,9 +42,17 @@ public:
         delete[] _t;
     }
 
-    T operator[](int i){
+    T& operator[](int i){
         int indexer = i % 4;
         return _t[indexer];
+    }
+
+    T* begin(){
+        return _t;
+    }
+
+    T* end(){
+        return _t + 4;
     }
 
     bool operator==(cpair<T> &oth_t){

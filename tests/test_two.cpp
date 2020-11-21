@@ -150,15 +150,44 @@ void t7(){
 
     cv3.transpose();
     cv3.print_vec();
-}
 
-int main(){
-    CVec cv1(10);
-    CVec cv2(10);
     cpair<CVec> res(cv1, cv2);
 
     res[0].print_vec();
     res[1].print_vec();
+    CMatrix cm1 = rng.gen_randmatrix(10, 10);
+    cm1.print_matrix();
+    cm1.resize(5,30);
+    cm1.print_matrix();
+    cm1.resize(15, 20);
+    cm1.print_matrix();
+    cm1.resize(1, 1);
+    cm1.print_matrix();
+    cm1.resize(30, 30);
+    cm1.print_matrix();
+
+    CVec cv5 = rng.gen_randvec(100);
+    cv5.print_vec();
+    cv5.transpose();
+    cv5.print_vec();
+
+    CVec cv = rng.gen_randvec(5);
+    for(double c: cv){
+        std::cout << "c = " << c << std::endl;
+    }
+}
+
+int main(){
+    RAND_ENG::RNG rng;
+    CMatrix cm1 = rng.gen_randmatrix(10, 10);
+    CMatrix cm2 = rng.gen_randmatrix(10, 10);
+    CMatrix cm3 = rng.gen_randmatrix(10, 10);
+    CMatrix cm4 = rng.gen_randmatrix(10, 10);
+    // cquad<CMatrix> cms(cm1, cm2, cm3, cm4);
+    // for(int i=0; i<4; i++){
+    //     // TODO: why tf doesnt this work??
+    //     cms[i].print_matrix();
+    // }
 
     return 0;
 }

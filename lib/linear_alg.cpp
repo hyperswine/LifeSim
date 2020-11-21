@@ -1,5 +1,7 @@
 #include "hyper_math/linear_alg.h"
 #include "hyper_math/hypmath.h"
+#include "backend.h"
+#include <string>
 #include <any>
 #include <math.h>
 #include <iostream>
@@ -63,13 +65,17 @@ void CVec::transpose(){
 void CVec::print_vec(){
     if(column_vec){
         std::cout << "==Column vector, size: " << cur_size << std::endl;
-        for(int i=0; i<cur_size; i++)
-            std::cout << vec[i] << std::endl; 
+        for(int i=0; i<cur_size; i++){
+            std::cout.precision(2); 
+            std::cout << std::scientific << vec[i] << std::endl;
+        }
     }
     else{
         std::cout << "==Row vector, size: " << cur_size << std::endl;
-        for(int i=0; i<cur_size; i++)
-            std::cout << " " << vec[i];
+        for(int i=0; i<cur_size; i++){
+            std::cout.precision(2); 
+            std::cout << std::scientific << " " << vec[i];
+        }
         std::cout << std::endl;
     }
     std::cout << "==End vector\n" << std::endl;
@@ -78,18 +84,18 @@ void CVec::print_vec(){
 // assume that an index > size is a mistake. A negative index < -size = backward indexing.
 quadruple& CVec::operator[](int i) const{
     // out of bounds vector access
-    if(abs(i) >= len()) throw OUT_OF_BOUNDS;
+    if(abs(i) >= cur_size) throw OUT_OF_BOUNDS;
 
-    size_t indexer = i % len(); // for negative indexing
+    size_t indexer = i % cur_size; // for negative indexing
     return vec[indexer];
 }
 bool CVec::operator!=(const CVec& oth_vec) const{
     return !(*this==oth_vec);
 }
 bool CVec::operator==(const CVec& oth_vec) const{
-    if(len() != oth_vec.len()) return false;
+    if(cur_size != oth_vec.len()) return false;
 
-    for(int i=0; i<len(); i++) if(vec[i] != oth_vec[i]) return false;
+    for(int i=0; i<cur_size; i++) if(vec[i] != oth_vec[i]) return false;
 
     return true;
 }
@@ -97,15 +103,18 @@ bool CVec::operator==(const CVec& oth_vec) const{
 // Would be fatal if not.
 void CVec::operator=(quadruple* new_arr){
     // assign vec
+    delete[] vec;
     vec = new_arr;
 }
 void CVec::operator=(CVec& oth_vec){
     // move the memory from oth_vec to this vec
     column_vec = oth_vec.column_vec;
     cur_size  = oth_vec.len();
+    delete[] vec;
     vec = new quadruple[cur_size];
     
     // be sure that this works -> should work since quadruple is primitive & only one level of pointer
+    // basically overwrites everything in this
     memmove(vec, oth_vec.vec, cur_size*sizeof (quadruple));
 }
 // elementwise addition
@@ -209,12 +218,14 @@ CMatrix::~CMatrix(){
 }
 
 // print current matrix
+// NOTE: need to space the numbers according to the largest number of significant digits
 void CMatrix::print_matrix(){
     // print each row, line by line
     std::cout<< "===Matrix:" << rows() << "x" << cols() << "====" << std::endl;
     for(int i=0; i<rows(); i++){
         for(int j=0; j<cols(); j++){
-            std::cout << " " << matrix[i][j]; 
+            std::cout.precision(2);
+            std::cout << std::scientific << " " << matrix[i][j]; 
         }
         // end line
         std::cout << "\n";
@@ -252,19 +263,75 @@ void CMatrix::transpose(){
 void CMatrix::resize(int a, int b){
     if(a == rows() && b == cols()) return;
 
-    // TODO: resize matrix so it is a x b
+    // make res, then remake matrix & copy res
+    CMatrix res(a, b);
 
-    // if increase rows, then append 0s
-    // if decrease rows, then truncate
-    // if increase cols, then append 0s
-    // if decrease cols, then truncate
+    // only have to care about enlargening, shrinking done automatically
+    for(int i=0; i<a; i++){
+        for(int j=0; j<b; j++){
+            // default
+            if(i < rows() && j < cols())
+                res[i][j] = matrix[i][j];
+            // enlargening: technically dont need else if, but just in case
+            else if(i >= rows() || j >= cols())
+                res[i][j] = 0;
+        }
+    }
+    delete[] matrix;
+    matrix = new CVec[a];
+    n = a;
+    m = b;
+
+    // initialize matrix
+    for (int i=0; i<a; i++){
+        matrix[i].resize(b);
+        matrix->transpose(); // each CVec is a row vector
+    }
+
+    // apply copy constructor on all cvecs
+    for(int i=0; i<a; i++) matrix[i] = res[i];
 }
 
 // if matrix isn't square, there will be problems
+// NOTE: HAVE TO DO THIS THE HARD WAY IT SEEMS
+// UNLESS YOU CAN FIGURE OUT HOW TO DO THOSE INDEXES PROPERLY
 cquad<CMatrix> CMatrix::div_quadrants(){
-    cquad<CMatrix> res(CMatrix(1,2), CMatrix(1,2), CMatrix(1,2), CMatrix(1,2));
-    // TODO: divide matrix into 4 chunks and return them
+    if(rows() != cols() || rows() == 1 || cols() == 1) throw INVALID_OP;
 
+    // floor(row/2) - 1 and floor(row/2) for indicies
+    // e.g. 5 x 5 matrix -> upperleft = f1 x f1, upperright = f1 x f2
+    //                      lowerleft = f2 x f1, lowerright f2 x f2
+    int f1 = rows() / 2;
+    int f2 = rows() / 2;
+    c_log(std::to_string(f1) + std::to_string(f2));
+
+    CMatrix cm1(f1,f1);
+    CMatrix cm2(f1,f2+1);
+    CMatrix cm3(f2+1,f1);
+    CMatrix cm4(f2+1,f2+1);
+    // divide matrix into 4 chunks and return them
+
+    // copy upperleft
+    for(int i=0; i<f1; i++)
+        for(int j=0; j<f1; j++)
+            cm1[i][j] = matrix[i][j];
+        
+    // copy upperright
+    for(int i=0; i<f1; i++)
+        for(int j=f1; j<cols(); j++)
+            cm2[i][j] = matrix[i][j];
+ 
+    // copy lowerleft
+    for(int i=f1; i<rows(); i++)
+        for(int j=0; j<f1; j++)
+            cm3[i][j] = matrix[i][j];
+
+    // copy lowerright
+    for(int i=f1; i<rows(); i++)
+        for(int j=f1; j<cols(); j++)
+            cm4[i][j] = matrix[i][j];
+    
+    cquad<CMatrix> res(cm1, cm2, cm3, cm4);
     return res;
 }
 

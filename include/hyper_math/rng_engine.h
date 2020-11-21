@@ -40,6 +40,7 @@ public:
     ////////////////////////////
 
     // generate a vector of random values, length n
+    // NOTE: the default options generate quite large numbers ~10^9
     CVec gen_randvec(int);
     CMatrix gen_randmatrix(int, int);
     // generate a vector of length n, with values between [a, b]

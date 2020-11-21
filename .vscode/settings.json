@@ -71,7 +71,8 @@
         "xlocnum": "cpp",
         "xloctime": "cpp",
         "xstddef": "cpp",
-        "Enumerations.H": "cpp"
+        "Enumerations.H": "cpp",
+        "cstdarg": "cpp"
     },
     "cSpell.words": [
         "timestep",
