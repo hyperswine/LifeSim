@@ -249,9 +249,20 @@ void CMatrix::transpose(){
     }
 }
 
+void CMatrix::resize(int a, int b){
+    if(a == rows() && b == cols()) return;
+
+    // TODO: resize matrix so it is a x b
+
+    // if increase rows, then append 0s
+    // if decrease rows, then truncate
+    // if increase cols, then append 0s
+    // if decrease cols, then truncate
+}
+
 // if matrix isn't square, there will be problems
 cquad<CMatrix> CMatrix::div_quadrants(){
-    cquad<CMatrix> res(CMatrix, CMatrix, CMatrix, CMatrix);
+    cquad<CMatrix> res(CMatrix(1,2), CMatrix(1,2), CMatrix(1,2), CMatrix(1,2));
     // TODO: divide matrix into 4 chunks and return them
 
     return res;
@@ -467,7 +478,7 @@ CMatrix CMatrix::strassen_multiply(CMatrix& m2){
         int max_a = max_dimension(rows(), cols());
         int max_b = max_dimension(m2.rows(), m2.cols());
         int max_dim = max_dimension(max_a, max_b);
-        resize(max_dim, max_dim);
+        this->resize(max_dim, max_dim);
         m2.resize(max_dim, max_dim);
     }
 

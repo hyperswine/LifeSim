@@ -55,7 +55,7 @@ quadruple argon_pot(CVec r_i, CVec r_j){
 // can think of it as the entire potential energy of the system
 quadruple force_potential(CMatrix pos, int index){
     // for a given position to other all positions, compute potential(pos(i), pos(i+1..N))
-    quadruple accum_v;
+    quadruple accum_v = 0;
     for(int i=0; i<pos.rows()-2; i++){
         for(int j=i+1; j<pos.cols()-1; j++){
             // accumulate potential(pos(i), pos(j))

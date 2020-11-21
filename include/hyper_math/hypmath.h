@@ -28,14 +28,18 @@ public:
 
 template <class T> class cquad{
 private:
-    T _t[4];
+    T* _t;
 
 public:
     cquad(T a, T b, T c, T d){
+        _t = new T[4];
         _t[0] = a;
         _t[1] = b;
         _t[2] = c;
         _t[3] = d;
+    }
+    ~cquad(){
+        delete[] _t;
     }
 
     T operator[](int i){
