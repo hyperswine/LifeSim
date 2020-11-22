@@ -10,8 +10,8 @@ long int fact(const int& x){
     return res;
 }
 
-// 10 term series taylor approximation
-// TODO: for common pi/4, pi/2, pi.. etc, returns actual
+// 10 term series taylor expansion
+// common pi/4, pi/2, pi.. etc, returns an approximate value due to machine epsilon and taylor approximation
 double c_sin(double x){
     double res = 0;
     bool neg = false;

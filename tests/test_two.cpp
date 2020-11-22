@@ -181,16 +181,16 @@ void t7(){
 
 int main(){
     RAND_ENG::RNG rng;
-    // complexv c_v(c_pi);
-    // c_v.print(); // note that double represents up to 15 sig figs. Quadruple -> 36 sig figs
+    complexv c_v(q_pi);
+    c_v.print(); // note that double represents up to 15 sig figs. Quadruple -> 36 sig figs
 
-    t1();
-    t2();
-    t3();
-    t4();
-    t5();
-    t6();
-    t7();
+    // t1();
+    // t2();
+    // t3();
+    // t4();
+    // t5();
+    // t6();
+    // t7();
 
     // qmatrix cm_x1 = rng.gen_randmatrix(10, 10);
     // qmatrix cm_x2 = rng.gen_randmatrix(10, 20);

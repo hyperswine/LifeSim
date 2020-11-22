@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include)
 include_directories(include/hypermath)
+include_directories(tests)
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(tests)

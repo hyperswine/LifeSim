@@ -16,6 +16,11 @@ void Tester::assert_t(bool cond, int line, const char* file){
         std::cout << "Line: " << line << ", File: " << file << std::endl;
         std::cout << "---------------------------" << std::endl;
     }
+    else{
+        std::cout << "----------" << std::endl;
+        std::cout << "  PASSED  " << std::endl;
+        std::cout << "----------" << std::endl;
+    }
 }
 
 // set up a 'round' of testing of n tests

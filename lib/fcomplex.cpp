@@ -1,8 +1,14 @@
 // Definition of complex numbers and operations involving them.
 // cmath implements PI as a long double, so no need to redefine constants
 #include "hyper_math/fcomplex.h"
+#include "hyper_math/hypmath.h"
 #include <cmath>
 #include <iostream>
+
+complexv::complexv(){
+    a = 0;
+    b = 1;
+}
 
 complexv::complexv(double x, double y){
     a = x;
@@ -63,4 +69,9 @@ complexv complexv::operator/(const complexv& c2){
 
 bool complexv::operator==(const complexv& c2){
     return (re()==c2.re() && im()==c2.im());
+}
+
+void complexv::operator=(const complexv& c2){
+    a = c2.re();
+    b = c2.im();
 }

@@ -2,7 +2,9 @@
 #pragma once
 
 typedef long double quadruple;
-#define c_pi 3.141592653589793238462643383279502884L
+#define c_pi 3.14159265358979
+// for extra precision. do not use for FFT
+#define q_pi 3.141592653589793238462643383279502884L
 
 // factorial -> 20! limit
 long int fact(const int& x);

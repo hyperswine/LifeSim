@@ -9,6 +9,7 @@ private:
     double a;
     double b;
 public:
+    complexv();
     // numeric representation, a + ib
     complexv(double, double);
     // exponential representation, e^{i*theta}, where input = theta, e.g. pi
@@ -30,34 +31,4 @@ public:
     // re-set, i.e. copy operator
     void operator=(const complexv&);
 
-};
-
-
-// complex valued vector
-class cv_vec{
-private:
-    complexv* vec;
-
-public:
-    cv_vec();
-    cv_vec(int);
-    ~cv_vec();
-
-    double operator*(const cv_vec&);
-    complexv& operator[](int& i);
-};
-
-
-// complex valued matrix
-class cv_matrix{
-private:
-    cv_vec* matrix;
-
-public:
-    cv_matrix();
-    cv_matrix(int, int);
-    ~cv_matrix();
-
-    cv_matrix operator*(const cv_matrix&);
-    cv_vec& operator[](int& i);
 };
