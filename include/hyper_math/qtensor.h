@@ -1,6 +1,6 @@
 // our implementations of linear algebra structures
 // NOTE: chose specifically to treat vectors and matrices as separate entities
-// since we're dealing in a physics context
+// since we're dealing in a physics/scientific context
 
 #pragma once
 #include "hyper_math/hypmath.h"
@@ -104,6 +104,7 @@ public:
     /////////////
 
     bool operator==(const qmatrix&);
+    qvec operator*(const qvec&);
     qmatrix operator*(const qmatrix&); // standard O(n^3) multiplication
     qmatrix operator&(const qmatrix&); // tensor product/kronecker product
     qvec& operator[](int& i) const;

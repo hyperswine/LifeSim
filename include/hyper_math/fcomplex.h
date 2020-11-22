@@ -23,8 +23,9 @@ public:
     void print() const;
 
     complexv operator+(const complexv&);
+    void operator+=(const complexv&);
     complexv operator-(const complexv&);
-    complexv operator*(const complexv&);
+    complexv operator*(const complexv&) const;
     complexv operator/(const complexv&);
     // equivalence
     bool operator==(const complexv&);

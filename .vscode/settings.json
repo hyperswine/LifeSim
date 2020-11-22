@@ -72,7 +72,8 @@
         "xloctime": "cpp",
         "xstddef": "cpp",
         "Enumerations.H": "cpp",
-        "cstdarg": "cpp"
+        "cstdarg": "cpp",
+        "utests_x": "cpp"
     },
     "cSpell.words": [
         "complexv",

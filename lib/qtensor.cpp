@@ -142,7 +142,7 @@ quadruple qvec::operator*(const qvec& oth_vec){
     quadruple scalar_sum = 0;
     for(int i=0; i<len(); i++) scalar_sum += vec[i] * oth_vec[i];
 
-    return 0;
+    return scalar_sum;
 }
 // elementwise multiplication
 qvec qvec::operator*(const quadruple m){
@@ -442,7 +442,17 @@ qvec& qmatrix::operator[](int& i) const{
     int indexer = i % n;
     return matrix[indexer];
 }
+qvec qmatrix::operator*(const qvec& vec_mult){
+    if(vec_mult.len() != cols()) throw INVALID_OP;
 
+    qvec res(rows());
+    // multiply each cvec 
+    for(int i=0; i<rows(); i++){
+        res[i] = matrix[i] * vec_mult;
+    }
+
+    return res;
+}
 qmatrix qmatrix::operator*(const qmatrix& m2){
     if (cols() != m2.rows()) throw UNSYMMETRIC_SIZE;
 

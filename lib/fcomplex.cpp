@@ -43,12 +43,18 @@ complexv complexv::operator+(const complexv& c2){
     return res;
 }
 
+// add the value of c2 to this value
+void complexv::operator+=(const complexv& c2){
+    a += c2.re();
+    b += c2.im();
+}
+
 complexv complexv::operator-(const complexv& c2){
     complexv res(re() - c2.re(), im() - c2.im());
     return res;
 }
 
-complexv complexv::operator*(const complexv& c2){
+complexv complexv::operator*(const complexv& c2) const{
     // (a+bi)(x+yi) = ax - by + (ay + bx)i
     double new_a = (re() * c2.re()) - (im() * c2.im());
     double new_b = (re() * c2.im()) + (im() * c2.re());
