@@ -11,3 +11,8 @@ Talk about invalid ops and exceptions in paper
 Before submitting, subclass cmatrix and qmatrix from 'tmatrix' to prevent too much repeated code -> though I think we have to implement them separately like this anyway
 Its simply to make it look less repetitive.
 
+
+## Conclusion:
+    Things to do: Make program more polymorphic and utilize OOP practices for better extendability and less repetitiveness
+                  Implement a frontend based on opengl from scratch, to visualize molecules
+                  Have an option to write everything to file and make it work on VMD

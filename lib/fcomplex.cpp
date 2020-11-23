@@ -21,10 +21,10 @@ complexv::complexv(double theta_rad){
     b = sin(theta_rad);
 }
 
-double complexv::re() const{
+double& complexv::re(){
     return a;
 }
-double complexv::im() const{
+double& complexv::im(){
     return b;
 }
 void complexv::set_re(double x){
@@ -38,32 +38,32 @@ void complexv::print() const{
     std::cout << a << " + i*" << b << std::endl;
 }
 
-complexv complexv::operator+(const complexv& c2){
+complexv complexv::operator+(complexv& c2){
     complexv res(re() + c2.re(), im() + c2.im());
     return res;
 }
 
 // add the value of c2 to this value
-void complexv::operator+=(const complexv& c2){
+void complexv::operator+=(complexv& c2){
     a += c2.re();
     b += c2.im();
 }
 
-complexv complexv::operator-(const complexv& c2){
+complexv complexv::operator-(complexv& c2){
     complexv res(re() - c2.re(), im() - c2.im());
     return res;
 }
 
-complexv complexv::operator*(const complexv& c2) const{
+complexv complexv::operator*(complexv& c2) const{
     // (a+bi)(x+yi) = ax - by + (ay + bx)i
-    double new_a = (re() * c2.re()) - (im() * c2.im());
-    double new_b = (re() * c2.im()) + (im() * c2.re());
+    double new_a = (a * c2.re()) - (b * c2.im());
+    double new_b = (a * c2.im()) + (b * c2.re());
 
     complexv res(new_a, new_b);
     return res;
 }
 
-complexv complexv::operator/(const complexv& c2){
+complexv complexv::operator/(complexv& c2){
     // (a+bi)/(x+yi) = conjugate -> (ax+by)/(x^2 + y^2) + i(bx-ay)/(x^2 + y^2)
     double o_top = (re() * c2.re()) + (im() * c2.im());
     double t_top =  - (re() * c2.im()) + (im() * c2.re());
@@ -73,11 +73,11 @@ complexv complexv::operator/(const complexv& c2){
     return res;
 }
 
-bool complexv::operator==(const complexv& c2){
+bool complexv::operator==(complexv& c2){
     return (re()==c2.re() && im()==c2.im());
 }
 
-void complexv::operator=(const complexv& c2){
+void complexv::operator=(complexv& c2){
     a = c2.re();
     b = c2.im();
 }

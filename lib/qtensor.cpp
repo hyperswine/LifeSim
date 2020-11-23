@@ -80,7 +80,23 @@ void qvec::print_vec(){
     }
     std::cout << "==End vector\n" << std::endl;
 }
+qvec qvec::operator[](odd_even type){
+    if(type == ODD_T){
+        qvec res(std::floor(len()/2));
+        for(int i=1; i<len(); i+=2)
+            res[i] = vec[i];
 
+        return res;
+    }
+    else{
+        qvec res(std::ceil(len()/2));
+
+        for(int i=0; i<len(); i+=2)
+            res[i] = vec[i];
+
+        return res;
+    }
+}
 quadruple& qvec::operator[](int& i) const{
     if(abs(i) >= cur_size) throw OUT_OF_BOUNDS;
 

@@ -4,6 +4,7 @@
 #pragma once
 #include "hyper_math/rng_engine.h"
 #include "hyper_math/qtensor.h"
+#include "hyper_math/ctensor.h"
 #include <random>
 
 // specify generation method
@@ -47,6 +48,10 @@ public:
     qvec gen_randvec(int, int, int);
     qmatrix gen_randmatrix(int, int, int, int);
 
+    cvec gen_cvec(int);
+    cvec gen_cvec(int, int, int);
+    cmatrix gen_cmatrix(int, int);
+    cmatrix gen_cmatrix(int, int, int, int);
 };
 
 }

@@ -6,6 +6,8 @@ typedef long double quadruple;
 // for extra precision. do not use for FFT
 #define q_pi 3.141592653589793238462643383279502884L
 
+enum odd_even{ODD_T, EVEN_T};
+
 // factorial -> 20! limit
 long int fact(const int& x);
 

@@ -2,6 +2,7 @@
 #include "hyper_math/qtensor.h"
 #include "hyper_math/ctensor.h"
 #include "hyper_math/fcomplex.h"
+#include "hyper_math/fourier_field.h"
 #include "hyper_math/hypmath.h"
 #include "hyper_math/rng_engine.h"
 #include "tester.h"
@@ -23,13 +24,19 @@ public:
     cvec& cv1 = cvec(10);
     cvec& cv2 = cvec(10);
 
-    tfixture_1(){
+    tfixture_1(){}
+    ~tfixture_1(){}
+};
 
-    }
-    // call destructor for all variables?
-    ~tfixture_1(){
-        
-    }
+
+class tfixture_dft{
+public:
+    cvec& cv1 = _rng.gen_cvec(10);
+    cvec& cv1 = _rng.gen_cvec(16, -1, 1);
+    cvec& cv2 = cvec(10);
+
+    tfixture_2(){}
+    ~tfixture_2(){}
 };
 
 void test_basic(){
@@ -64,3 +71,9 @@ void test_complex_basic(){
     complexv cv_res = _t.cv1 * _t.cv2;
     cv_res.print();
 }
+
+void test_dft(){
+
+
+}
+

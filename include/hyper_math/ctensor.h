@@ -3,6 +3,7 @@
 //  if using FFT, the user should only be interfacing with their raw data
 #pragma once
 #include "fcomplex.h"
+#include "hyper_math/hypmath.h"
 
 // complex valued vector
 class cvec{
@@ -21,8 +22,11 @@ public:
     void print_vec();
 
     complexv operator*(const cvec&);
+    // return odd or even terms as another vector
+    cvec operator[](odd_even);
     complexv& operator[](int& i) const;
     complexv& operator[](int&& i) const;
+    void operator=(const cvec&);
 };
 
 
@@ -38,6 +42,8 @@ public:
     cmatrix(int, int);
     ~cmatrix();
 
+    int rows();
+    int cols();
     // turn matrix from n x m to m x n
     void transpose();
     void print_matrix();

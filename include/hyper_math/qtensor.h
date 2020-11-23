@@ -43,6 +43,7 @@ public:
     void print_vec();
 
     // vector indexer. values are assignable.
+    qvec operator[](odd_even);
     quadruple& operator[](int& i) const;
     quadruple& operator[](int&& i) const; //array access -> supports negative indexes
     void operator=(quadruple*); // assign to a new array. Care should be taken to ensure new malloced array is the same size.

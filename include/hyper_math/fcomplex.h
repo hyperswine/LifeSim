@@ -18,18 +18,18 @@ public:
 
     void set_re(double);
     void set_im(double);
-    double re() const;
-    double im() const;
+    double& re();
+    double& im();
     void print() const;
 
-    complexv operator+(const complexv&);
-    void operator+=(const complexv&);
-    complexv operator-(const complexv&);
-    complexv operator*(const complexv&) const;
-    complexv operator/(const complexv&);
+    complexv operator+(complexv&);
+    void operator+=(complexv&);
+    complexv operator-(complexv&);
+    complexv operator*(complexv&) const;
+    complexv operator/(complexv&);
     // equivalence
-    bool operator==(const complexv&);
+    bool operator==(complexv&);
     // re-set, i.e. copy operator
-    void operator=(const complexv&);
+    void operator=(complexv&);
 
 };
