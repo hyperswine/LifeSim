@@ -1,20 +1,8 @@
 // our implementations of linear algebra structures
 // NOTE: chose specifically to treat vectors and matrices as separate entities
 // since we're dealing in a physics/scientific context
-
 #pragma once
 #include "hyper_math/hypmath.h"
-
-const int OUT_OF_BOUNDS = -1;
-const int UNSYMMETRIC_SIZE = -2;
-const int TOO_LARGE = -3;
-const int MEMORY_ERROR = -4;
-const int INVALID_OP = -5;
-
-// Arbitrary Limit: we should not be storing anything more than this value in a vector
-// May have to adjust depending on practice
-const int dbl_stack = 50000;
-const int DEFAULT_THREADS = 16;
 
 class qvec;
 class qmatrix;

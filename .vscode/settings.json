@@ -73,7 +73,8 @@
         "xstddef": "cpp",
         "Enumerations.H": "cpp",
         "cstdarg": "cpp",
-        "utests_x": "cpp"
+        "utests_x": "cpp",
+        "htensor": "cpp"
     },
     "cSpell.words": [
         "complexv",

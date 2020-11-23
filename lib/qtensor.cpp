@@ -23,7 +23,7 @@ qvec::qvec(){
 
 // create a new vector (max size = dbl_stack -> 50,000 elements)
 qvec::qvec(int n){
-    if (n > dbl_stack) throw TOO_LARGE;
+    if (n > STACK_LIMIT) throw TOO_LARGE;
     vec = new quadruple[n];
     zero_vec(vec, n);
 
@@ -32,7 +32,7 @@ qvec::qvec(int n){
 }
 
 qvec::qvec(int n, bool col_vec){
-    if (n > dbl_stack) throw TOO_LARGE;
+    if (n > STACK_LIMIT) throw TOO_LARGE;
     vec = new quadruple[n];
     zero_vec(vec, n);
 
@@ -185,7 +185,7 @@ quadruple qvec::operator|(const qvec& oth_vec){
 }
 
 void qvec::resize(int new_size){
-    if(new_size <= 0 || new_size > dbl_stack) throw INVALID_OP;
+    if(new_size <= 0 || new_size > STACK_LIMIT) throw INVALID_OP;
     quadruple* new_vec = new quadruple[new_size];
 
     // if new len > cur_size, append zeros (memset new_len-cur_size)

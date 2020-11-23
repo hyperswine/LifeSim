@@ -2,7 +2,7 @@
 #include "fcomplex.h"
 #include "ctensor.h"
 #include "qtensor.h"
-#include "hyp_math.h"
+#include "hypmath.h"
 
 // slow dft. No requirements, thought would be great if points were evenly spaced out and were sequential
 cvec dft(const qvec&);

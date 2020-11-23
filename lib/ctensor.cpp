@@ -129,11 +129,11 @@ cmatrix cmatrix::operator*(const cmatrix& m2){
 }
 // matrix-vector multiplication O(nm)
 cvec cmatrix::operator*(const cvec& v2){
-
+    return cvec(1);
 }
 cvec& cmatrix::operator[](int& i){
-
+    return matrix[i];
 }
 cvec& cmatrix::operator[](int&& i){
-
+    return matrix[i];
 }

@@ -14,18 +14,19 @@ cvec dft(const qvec& x){
     int N = x.len();
     if(!IS_INT(log2(N))){
         // common way to find next power. Not as fast, but works.
-        N = pow(2, ceil(log2(x)));
+        N = pow(2, ceil(log2(N)));
     }
 
     cvec dft_res(N);
 
     for(int k=0; k<N; k++){
         for(int j=0; j<N; j++){
-            dft_res[i] += x[i] * complexv(-2*c_pi*k*j/N);
+            complexv temp(-2*c_pi*k*j/N);
+            dft_res[k] += x[j] * temp;
         }
     }
 
-    return cvec;
+    return dft_res;
 }
 
 // Inverse DFT
@@ -41,7 +42,7 @@ qvec inverse_dft(const cvec& x){
 cvec fft_v1(const qvec& x){
     int N = x.len();
     // quick append -> happens at most once on call
-    if(!IS_INT(log2(N))) N = pow(2, ceil(log2(x)));
+    if(!IS_INT(log2(N))) N = pow(2, ceil(log2(N)));
     
     cvec res(N);
     // base condition
@@ -56,10 +57,10 @@ cvec fft_v1(const qvec& x){
     
         // join them together in order
         for(int k=0; k<N; k++){
-            if(i%2==0)
-                res[i] += _even[i/2] * complexv(-2*c_pi*k*j/N);
+            if(k%2==0)
+                res[k] += _even[k/2] * complexv(-2*c_pi*k/N);
             else
-                res[i] += _odd[i/2] * complexv(-2*c_pi*k*j/N);
+                res[k] += _odd[k/2] * complexv(-2*c_pi*k/N);
         }
 
         // return the dft from 0..N (current N)
@@ -70,12 +71,12 @@ cvec fft_v1(const qvec& x){
 
 // Take in a series of points and a function that maps the points
 // Returns the DFT of {f} on {x}
-cvec fft_v2(const qvec& x, (void*)(quadruple) f_x){
-    qvec mapped_f(x.len());
+// cvec fft_v2(const qvec& x, (void*)(quadruple) f_x){
+//     qvec mapped_f(x.len());
 
-    // apply f_x to all x
-    for(int i=0; i<x.len(); i++) mapped_f[i] = f_x(x[i]);
+//     // apply f_x to all x
+//     for(int i=0; i<x.len(); i++) mapped_f[i] = f_x(x[i]);
 
-    // return result of fft
-    return fft_v1(mapped_f);
-}
+//     // return result of fft
+//     return fft_v1(mapped_f);
+// }

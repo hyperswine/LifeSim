@@ -1,2 +1,24 @@
+// Tensors, N-dimensional
+// In-progress -> requires extra testing
+// ALSO dont forget to include in CMakeLists.txt!
 #pragma once
+#include "hypmath.h"
+
+class htensor;
+template<class T> class hvec;
+template<class T> class hmatrix;
+
+class htensor{
+public:
+    int n_dimensions;
+    int* dimensions;
+
+private:
+    htensor(int n_dim);
+    ~htensor();
+
+    // common operators
+
+    // useful operations
+};
 

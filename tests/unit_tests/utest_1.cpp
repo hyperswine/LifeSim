@@ -32,11 +32,11 @@ public:
 class tfixture_dft{
 public:
     cvec& cv1 = _rng.gen_cvec(10);
-    cvec& cv1 = _rng.gen_cvec(16, -1, 1);
-    cvec& cv2 = cvec(10);
+    cvec& cv2 = _rng.gen_cvec(16, -1, 1);
+    cvec& cv3 = cvec(10);
 
-    tfixture_2(){}
-    ~tfixture_2(){}
+    tfixture_dft(){}
+    ~tfixture_dft(){}
 };
 
 void test_basic(){
@@ -73,7 +73,11 @@ void test_complex_basic(){
 }
 
 void test_dft(){
+    tfixture_1 _t;
+    _t.qv1.print_vec();
+    _t.qv1.print_vec();
 
+    cvec res = dft(_t.qv1);
 
 }
 

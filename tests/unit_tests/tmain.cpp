@@ -6,6 +6,7 @@ int main(int argc, char* argv[]){
     test_basic();
     test_two();
     test_complex_basic();
+    test_dft();
 
     return 0;
 }

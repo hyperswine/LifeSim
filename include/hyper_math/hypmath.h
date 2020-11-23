@@ -1,10 +1,19 @@
 // NOTE: cpair & cquad are basically the same classes -> abstract them out
 #pragma once
+#include "hyper_math/qtensor.h"
 
 typedef long double quadruple;
 #define c_pi 3.14159265358979
 // for extra precision. do not use for FFT
 #define q_pi 3.141592653589793238462643383279502884L
+
+const int OUT_OF_BOUNDS = -1;
+const int UNSYMMETRIC_SIZE = -2;
+const int TOO_LARGE = -3;
+const int MEMORY_ERROR = -4;
+const int INVALID_OP = -5;
+const int STACK_LIMIT = 50000; // Arbitrary Limit: we should not be storing anything more than this value in a vector
+const int DEFAULT_THREADS = 16;
 
 enum odd_even{ODD_T, EVEN_T};
 
@@ -74,4 +83,35 @@ public:
 
         return true;
     }
+};
+
+const unsigned int max_val = 0xFFFFFFFF;
+const unsigned int char_bits = 0x0000000F;
+
+/**
+ * CREDIT: Wikipedia for providing pseudocode for mersenne twister.
+ */ 
+class mt_rng{
+private:
+    size_t max_states;
+    // vector containing max. states (recurrences). Default value = 1000
+    qvec* states;
+    size_t index;
+    // r = 4 bits (char = 1byte)
+    unsigned int lower_mask = (1 << 4) - 1;
+    // take bits 0..3
+    unsigned int upper_mask = (~lower_mask) & (char_bits);
+
+    void twist();
+
+public:
+    mt_rng();
+    // provide an initial seed (int). Note if wanting to use clock time, random device, etc.
+    // must first extract an integer
+    mt_rng(int seed);
+    ~mt_rng();
+
+    // generate a value from the mersenne twister
+    unsigned int gen();
+    
 };
