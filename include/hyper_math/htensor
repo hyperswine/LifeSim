@@ -4,21 +4,21 @@
 #pragma once
 #include "hypmath.h"
 
-class htensor;
-template<class T> class hvec;
-template<class T> class hmatrix;
+// class htensor;
+// template<class T> class hvec;
+// template<class T> class hmatrix;
 
-class htensor{
-public:
-    int n_dimensions;
-    int* dimensions;
+// class htensor{
+// public:
+//     int n_dimensions;
+//     int* dimensions;
 
-private:
-    htensor(int n_dim);
-    ~htensor();
+// private:
+//     htensor(int n_dim);
+//     ~htensor();
 
-    // common operators
+//     // common operators
 
-    // useful operations
-};
+//     // useful operations
+// };
 

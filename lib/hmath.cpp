@@ -32,35 +32,35 @@ double c_cos(double x){
     return res;
 }
 
-mt_rng::mt_rng(){
+// mt_rng::mt_rng(){
 
-}
+// }
 
-mt_rng::mt_rng(int seed){
+// mt_rng::mt_rng(int seed){
 
-}
-mt_rng::~mt_rng(){
+// }
+// mt_rng::~mt_rng(){
 
-}
+// }
 
-void mt_rng::twist(){
-    for(int i=0; i<max_states; i++){
-        int x = states[i] & upper_mask + states[(i+1) % max_states] & lower_mask;
-        int x_a >>= 1;
-        if(x % 2 != 0) x_a ^= a;
-        states[i] = states[(i+m) % n] ^ x_a;
-    }
-    index = 0;
-}
+// void mt_rng::twist(){
+//     for(int i=0; i<max_states; i++){
+//         int x = states[i] & upper_mask + states[(i+1) % max_states] & lower_mask;
+//         int x_a >>= 1;
+//         if(x % 2 != 0) x_a ^= a;
+//         states[i] = states[(i+m) % n] ^ x_a;
+//     }
+//     index = 0;
+// }
 
-unsigned int mt_rng::gen(){
-    if(index >= max_states) twist();
+// unsigned int mt_rng::gen(){
+//     if(index >= max_states) twist();
 
-    quadruple y = states[index++];
-    y ^= (y>>u) & d;
-    y ^= (y<<s) & d;
-    y ^= (y<<t) & d;
-    y ^= y>>1;
+//     quadruple y = states[index++];
+//     y ^= (y>>u) & d;
+//     y ^= (y<<s) & d;
+//     y ^= (y<<t) & d;
+//     y ^= y>>1;
 
-    return (unsigned int) y & char_bits;
-}
+//     return (unsigned int) y & char_bits;
+// }

@@ -4,7 +4,7 @@
 #include "backend.h"
 #include <cmath>
 
-#define IS_INT(x) std::floor(x) == x
+#define IS_INT(x) (std::floor(x) == x)
 
 /**
  * Brute force DFT O(n^2). Based on the fact that x(hat)_k = sum(x_k * e^{-i*2pi*k*j/N} for j=0..N-1)
@@ -12,7 +12,7 @@
  */
 cvec dft(const qvec& x){
     int N = x.len();
-    if(!IS_INT(log2(N))){
+    if( !IS_INT(log2(N)) ){
         // common way to find next power. Not as fast, but works.
         N = pow(2, ceil(log2(N)));
     }
@@ -22,7 +22,7 @@ cvec dft(const qvec& x){
     for(int k=0; k<N; k++){
         for(int j=0; j<N; j++){
             complexv temp(-2*c_pi*k*j/N);
-            dft_res[k] += x[j] * temp;
+            // dft_res[k] += x[j] * temp;
         }
     }
 
@@ -31,7 +31,7 @@ cvec dft(const qvec& x){
 
 // Inverse DFT
 qvec inverse_dft(const cvec& x){
-
+    return qvec(1);
 }
 
 /**
@@ -63,10 +63,9 @@ cvec fft_v1(const qvec& x){
                 res[k] += _odd[k/2] * complexv(-2*c_pi*k/N);
         }
 
-        // return the dft from 0..N (current N)
-        return res;
     }
-
+    // return the dft from 0..N (current N)
+    return res;
 }
 
 // Take in a series of points and a function that maps the points
