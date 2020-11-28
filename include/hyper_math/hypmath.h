@@ -91,27 +91,27 @@ const unsigned int char_bits = 0x0000000F;
 /**
  * CREDIT: Wikipedia for providing pseudocode for mersenne twister.
  */ 
-class mt_rng{
-private:
-    size_t max_states;
-    // vector containing max. states (recurrences). Default value = 1000
-    qvec* states;
-    size_t index;
-    // r = 4 bits (char = 1byte)
-    unsigned int lower_mask = (1 << 4) - 1;
-    // take bits 0..3
-    unsigned int upper_mask = (~lower_mask) & (char_bits);
+// class mt_rng{
+// private:
+//     size_t max_states;
+//     // vector containing max. states (recurrences). Default value = 1000
+//     qvec* states;
+//     size_t index;
+//     // r = 4 bits (char = 1byte)
+//     unsigned int lower_mask = (1 << 4) - 1;
+//     // take bits 0..3
+//     unsigned int upper_mask = (~lower_mask) & (char_bits);
 
-    void twist();
+//     void twist();
 
-public:
-    mt_rng();
-    // provide an initial seed (int). Note if wanting to use clock time, random device, etc.
-    // must first extract an integer
-    mt_rng(int seed);
-    ~mt_rng();
+// public:
+//     mt_rng();
+//     // provide an initial seed (int). Note if wanting to use clock time, random device, etc.
+//     // must first extract an integer
+//     mt_rng(int seed);
+//     ~mt_rng();
 
-    // generate a value from the mersenne twister
-    unsigned int gen();
+//     // generate a value from the mersenne twister
+//     unsigned int gen();
     
-};
+// };
