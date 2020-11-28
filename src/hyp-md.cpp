@@ -51,7 +51,8 @@ quadruple argon_pot(qvec r_i, qvec r_j){
     return lj_potential(r_i, r_j, argon_eps, argon_sigma);
 }
 
-// compute total forces from all particles, which is basically the sum of their potential functions
+// TODO: this function
+// compute total forces from all particles, which is basically the partial derivative of the sum of their potential functions
 // can think of it as the entire potential energy of the system
 quadruple force_potential(qmatrix pos, int index){
     // for a given position to other all positions, compute potential(pos(i), pos(i+1..N))
@@ -66,11 +67,45 @@ quadruple force_potential(qmatrix pos, int index){
     return accum_v;
 }
 
+//////
+// TEMPORARY HELPER FUNCTIONS
+///////...
+
+// 1st order approximation. Works on both accelerations and velocities
+// Will work decently on small dt
+static qvec first_approx(qvec q, qvec q_prime, quadruple dt){
+    // q(t+dt) = q(t) + q'(t)*dt
+    return q + q_prime*dt;
+}
+
+// integrate accelerations to get velocities
+static qvec verlet_accelerations(qvec accel, quadruple delta){
+
+    return qvec();
+}
+
+// integrate velocities to get positions
+static qvec verlet_velocities(qvec positions, quadruple delta){
+
+    return qvec();
+}
+
+// adaptive runge-kutta 4th order approximation to integrate accelerations
+static qvec rk4_velocities(qvec a_j, quadruple dt=0.1){
+    auto v1 = a_j * dt;
+    // require a_j at t+dt/2 ? -> differentiate v at v(t) + 1/2v1
+    auto v2 = a_j
+
+    return qvec();
+}
+
+// adaptive runge-kutta 4th order approximation to integrate velocities
+static qvec rk4_velocities(qvec r_j, quadruple dt=0.1){
+    v1 = 
+    return qvec();
+}
 
 // Hyper-exponential space complexity for naive algorithm. O(n^2) time complexity. Would require writing to file if can't fit everything in memory
-
-// default [a, b] = [-1, 1]
-qmatrix naive_md(int n_particles, int n_timesteps, bool output_file);
 
 /** 
  * Calculate the positions of all atoms over n timesteps, and returns a 3D tensor containing all positions of all atoms over the n timesteps
@@ -78,7 +113,7 @@ qmatrix naive_md(int n_particles, int n_timesteps, bool output_file);
  * @param output_file -> True = outputs result to 'naive_md.out'
  * @param n -> timesteps and particles
  */
-qmatrix naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) {
+void naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) {
     RAND_ENG::RNG r_gen;
 
     // Remember that these structures are completely overwritten at each atom iteration i
@@ -92,19 +127,35 @@ qmatrix naive_md(int n_particles, int n_timesteps, int a, int b, bool output_fil
     qmatrix accelerations = r_gen.gen_randmatrix(n_particles, 3, a, b);
     qvec potentials(n_particles);
     qvec f(n_particles);
+    quadruple dt = 0.1;
 
     ///////////
     //  CALCULATIONS of md for n timesteps
     /////////
 
-    for (int i = 0; i < n_timesteps; i++) {
+    for (int i = 1; i <= n_timesteps; i++) {
         for (int j = 0; j < n_particles; j++) {
-            // v[j] = integrate accelerations
-            // r[j] = integrate velocities
 
-            // potentials[j] = energy(r)
+            // r_j = integrate velocity of current particle according to runge-kutta 4th scheme
+            positions[i][j] = first_approx(positions[i-1][j], velocities[i-1][j], dt);
+
+            // if the position exceeds boundaries, apply reflective boundary condition, i.e. in this case simply
+            // move it back in the opposite direction of limits by some factor x
+            if(boundary_condition(positions[i][j], a, b)){
+                apply_reflective(positions[j]);
+            }
+
+            // calculate all the forces acting on this particle
+            // partial derivative of sum(V(r_jk)) where j>k
+            f[j] = force_potential(positions, j);
+
+            // calculate acceleration
+            accelerations[i][j] = f[j];
+
+            // v_(j+1) = integrate acceleration
+            velocities[i][j] = first_approx(velocities[i][j], accelerations[i][j]);
+
         }
     }
 
-    return qmatrix(1, 1);
 }

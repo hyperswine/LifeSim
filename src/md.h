@@ -26,10 +26,15 @@ cpair<qvec> verlet_integration(qvec&, qvec&, qvec&, quadruple);
 quadruple lj_potential(qvec, qvec, quadruple eps, quadruple sigma);
 quadruple argon_pot(qvec, qvec);
 
+// duplicate a three-dimensional system into mirrored images of 9 parallel boxes
+
+
 // NAIVE MD Method
 // - no multithreading
 // - no list optimizations
 // - records positions of all particles at every timestep, instead of at every x timesteps
+void naive_md(int n_particles, int n_timesteps, int a=-1, int b=1, bool output_file=true);
 
-qmatrix naive_md(int n_particles, int n_timesteps, bool output_file);
-qmatrix naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file);
+// simulation in a two-dimensional simulation plane.
+// is a decent approximation for specific types of materials, e.g. compounds in catalysis
+qmatrix md_2d();
