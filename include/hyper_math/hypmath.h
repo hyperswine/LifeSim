@@ -1,6 +1,5 @@
 // NOTE: cpair & cquad are basically the same classes -> abstract them out
 #pragma once
-#include "hyper_math/qtensor.h"
 
 typedef long double quadruple;
 #define c_pi 3.14159265358979

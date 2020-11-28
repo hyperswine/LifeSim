@@ -16,8 +16,8 @@ quadruple sample_I(const qvec& input){
     quadruple sum;
 
     for(int i=0; i< input.len(); i++){
-        if(i%2==0) sum += sin(input[i]);
-        else sum += cos(input[i]);
+        // if(i%2==0) sum += sin(input[i]);
+        // else sum += cos(input[i]);
     }
 
     return sum;
@@ -30,12 +30,12 @@ quadruple hard_sample_I(const qvec& input){
     quadruple sum;
 
     for(int i=0; i< input.len(); i++){
-        if(i%3==0)
-            sum += sin(input[i]);
-        else if(i%3==1)
-            sum += cos(input[i]);
-        else
-            sum += tan(input[i]);
+        // if(i%3==0)
+        //     sum += sin(input[i]);
+        // else if(i%3==1)
+        //     sum += cos(input[i]);
+        // else
+        //     sum += tan(input[i]);
     }
 
     return sum;
@@ -51,10 +51,10 @@ quadruple sample_mc_integral(int n_gen){
 
     // generate random points in d-hypercube
     // HOW TO BOUND THE SPACE?
-    for(int i=0; i<n_gen; i++){
-        qvec in = _rng.gen_randvec(d_input, -1, 1);
-        out[i] = sample_I(in);
-    }
+    // for(int i=0; i<n_gen; i++){
+    //     qvec in = _rng.gen_randvec(d_input, -1, 1);
+    //     out[i] = sample_I(in);
+    // }
     
     // check how many in points have f(x) <= y
     // e.g. out[i] <= sample_I(in)
