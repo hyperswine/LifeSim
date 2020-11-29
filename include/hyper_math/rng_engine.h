@@ -47,6 +47,8 @@ public:
     // generate a vector of length n, with values between [a, b]
     qvec gen_randvec(int, int, int);
     qmatrix gen_randmatrix(int, int, int, int);
+    // normal distribution
+    qvec gen_normvec(int n, int mu, int sigma);
 
     cvec gen_cvec(int);
     cvec gen_cvec(int, int, int);

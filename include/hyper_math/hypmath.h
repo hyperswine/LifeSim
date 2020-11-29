@@ -1,5 +1,6 @@
 // NOTE: cpair & cquad are basically the same classes -> abstract them out
 #pragma once
+#include <string>
 
 typedef long double quadruple;
 #define c_pi 3.14159265358979
@@ -13,8 +14,12 @@ const int MEMORY_ERROR = -4;
 const int INVALID_OP = -5;
 const int STACK_LIMIT = 50000; // Arbitrary Limit: we should not be storing anything more than this value in a vector
 const int DEFAULT_THREADS = 16;
+// const std::string ODD_T = "odd";
+// const std::string EVEN_T = "even";
 
-enum odd_even{ODD_T, EVEN_T};
+typedef struct _odd_even{
+    bool even = true;
+} ODD_EVEN;
 
 // factorial -> 20! limit
 long int fact(const int& x);

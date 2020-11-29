@@ -4,3 +4,4 @@ void test_basic();
 void test_two();
 void test_complex_basic();
 void test_dft();
+void test_fft();

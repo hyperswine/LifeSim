@@ -4,6 +4,7 @@
 #pragma once
 #include "fcomplex.h"
 #include "hyper_math/hypmath.h"
+#include <string>
 
 // complex valued vector
 class cvec{
@@ -15,6 +16,7 @@ private:
 public:
     cvec();
     cvec(int);
+    cvec(cvec&);
     ~cvec();
 
     int len();
@@ -23,7 +25,7 @@ public:
 
     complexv operator*(const cvec&);
     // return odd or even terms as another vector
-    cvec operator[](odd_even);
+    cvec operator[](ODD_EVEN r);
     complexv& operator[](int& i) const;
     complexv& operator[](int&& i) const;
     void operator=(const cvec&);

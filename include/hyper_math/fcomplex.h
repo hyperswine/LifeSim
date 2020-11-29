@@ -15,6 +15,7 @@ public:
     // exponential representation, e^{i*theta}, where input = theta, e.g. pi
     // NOTE: theta is in radians. Do not use degrees!
     complexv(double);
+    complexv(complexv&);
 
     void set_re(double);
     void set_im(double);
@@ -24,8 +25,10 @@ public:
 
     complexv operator+(complexv&);
     void operator+=(complexv&);
+    // void operator+=(double&);
     complexv operator-(complexv&);
     complexv operator*(complexv&) const;
+    complexv operator*(double);
     complexv operator/(complexv&);
     // equivalence
     bool operator==(complexv&);

@@ -3,14 +3,20 @@
 #include <cmath>
 #include <iostream>
 
-#define init_vec(n) column_vec = true; vec = new complexv[n]; cur_size = n;
+#define init_vec(n) {column_vec = true; vec = new complexv[n]; cur_size = n;}
 
 // create a length 1 column vector
 cvec::cvec() {
-    init_vec(1);
+    init_vec(1)
 }
 cvec::cvec(int n) {
-    init_vec(n);
+    init_vec(n)
+}
+cvec::cvec(cvec& to_copy){
+    init_vec(to_copy.len())
+
+    for(int i=0; i<to_copy.len(); i++)
+        vec[i] = to_copy[i];
 }
 cvec::~cvec() {
     delete[] vec;
@@ -55,8 +61,10 @@ complexv cvec::operator*(const cvec& oth_vec) {
 }
 // if length is odd, then returns floor(len/2) for odd and ceil(len/2) for even
 // if length is even, returns len/2 for both. Thus floor(len/2) ODD, ceil(len/2) EVEN in both cases.
-cvec cvec::operator[](odd_even type) {
-    if (type == ODD_T) {
+cvec cvec::operator[](ODD_EVEN type) {
+    if(len()==1) return cvec(*this);
+
+    if (type.even == false) {
         // take every alternating index starting from [1]
         cvec res(std::floor(len() / 2));
         for (int i = 1; i < len(); i += 2)

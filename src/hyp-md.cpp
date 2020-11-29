@@ -91,17 +91,17 @@ static qvec verlet_velocities(qvec positions, quadruple delta){
 }
 
 // adaptive runge-kutta 4th order approximation to integrate accelerations
-static qvec rk4_velocities(qvec a_j, quadruple dt=0.1){
+static qvec rk4_accelerations(qvec a_j, quadruple dt=0.1){
     auto v1 = a_j * dt;
     // require a_j at t+dt/2 ? -> differentiate v at v(t) + 1/2v1
-    auto v2 = a_j
+    auto v2 = a_j;
 
     return qvec();
 }
 
 // adaptive runge-kutta 4th order approximation to integrate velocities
 static qvec rk4_velocities(qvec r_j, quadruple dt=0.1){
-    v1 = 
+
     return qvec();
 }
 
@@ -137,13 +137,13 @@ void naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) 
         for (int j = 0; j < n_particles; j++) {
 
             // r_j = integrate velocity of current particle according to runge-kutta 4th scheme
-            positions[i][j] = first_approx(positions[i-1][j], velocities[i-1][j], dt);
+            // positions[i][j] = first_approx(positions[i-1][j], velocities[i-1][j], dt);
 
             // if the position exceeds boundaries, apply reflective boundary condition, i.e. in this case simply
             // move it back in the opposite direction of limits by some factor x
-            if(boundary_condition(positions[i][j], a, b)){
-                apply_reflective(positions[j]);
-            }
+            // if(boundary_condition(positions[i][j], a, b)){
+            //     apply_reflective(positions[j]);
+            // }
 
             // calculate all the forces acting on this particle
             // partial derivative of sum(V(r_jk)) where j>k
@@ -153,7 +153,7 @@ void naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) 
             accelerations[i][j] = f[j];
 
             // v_(j+1) = integrate acceleration
-            velocities[i][j] = first_approx(velocities[i][j], accelerations[i][j]);
+            // velocities[i][j] = first_approx(velocities[i][j], accelerations[i][j]);
 
         }
     }

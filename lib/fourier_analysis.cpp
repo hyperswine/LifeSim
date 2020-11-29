@@ -5,6 +5,9 @@
 #include <cmath>
 
 #define IS_INT(x) (std::floor(x) == x)
+// C unfortunately compiles char*/strings as ints. This is a temporary solution.
+ODD_EVEN even_t{true};
+ODD_EVEN odd_t{false};
 
 /**
  * Brute force DFT O(n^2). Based on the fact that x(hat)_k = sum(x_k * e^{-i*2pi*k*j/N} for j=0..N-1)
@@ -19,12 +22,10 @@ cvec dft(const qvec& x){
 
     cvec dft_res(N);
 
-    for(int k=0; k<N; k++){
+    for(int k=0; k<N; k++)
         for(int j=0; j<N; j++){
-            complexv temp(-2*c_pi*k*j/N);
-            // dft_res[k] += x[j] * temp;
+            dft_res[k] += complexv(-2*c_pi*k*j/N) * ((double)x[j]);
         }
-    }
 
     return dft_res;
 }
@@ -44,28 +45,25 @@ cvec fft_v1(const qvec& x){
     // quick append -> happens at most once on call
     if(!IS_INT(log2(N))) N = pow(2, ceil(log2(N)));
     
-    cvec res(N);
-    // base condition
-    if(N == 2) res = dft(x);
+    if(N == 2) return dft(x);
     
     // the magic
     else{
+        cvec res(N);
         // call fft on even terms
-        cvec _even = fft_v1(x[EVEN_T]);
+        cvec _even = fft_v1(x[even_t]);
         // call fft on odd terms
-        cvec _odd = fft_v1(x[ODD_T]);
+        cvec _odd = fft_v1(x[odd_t]);
     
-        // join them together in order
-        for(int k=0; k<N; k++){
-            if(k%2==0)
-                res[k] += _even[k/2] * complexv(-2*c_pi*k/N);
-            else
-                res[k] += _odd[k/2] * complexv(-2*c_pi*k/N);
+        complexv w(1, 0);
+        // join them together
+        for(int k=0; k<N/2; k++){
+            res[k] += _even[k] + _odd[k] * w;
+            res[N/2+k] += _even[k] + _odd[k] * w;
+            w = complexv(2*c_pi*k/N) * w;
         }
-
-    }
-    // return the dft from 0..N (current N)
-    return res;
+        return res;
+    }    
 }
 
 // Take in a series of points and a function that maps the points

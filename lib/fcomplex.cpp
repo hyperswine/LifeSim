@@ -7,7 +7,7 @@
 
 complexv::complexv(){
     a = 0;
-    b = 1;
+    b = 0;
 }
 
 complexv::complexv(double x, double y){
@@ -19,6 +19,11 @@ complexv::complexv(double theta_rad){
     // evaluate cos(theta_rad) + i*sin(theta_rad)
     a = cos(theta_rad);
     b = sin(theta_rad);
+}
+
+complexv::complexv(complexv& to_copy){
+    a = to_copy.re();
+    b = to_copy.im();
 }
 
 double& complexv::re(){
@@ -60,6 +65,12 @@ complexv complexv::operator*(complexv& c2) const{
     double new_b = (a * c2.im()) + (b * c2.re());
 
     complexv res(new_a, new_b);
+    return res;
+}
+
+// multiply both real and imaginary parts
+complexv complexv::operator*(double lambda){
+    complexv res(a*lambda, b*lambda);
     return res;
 }
 

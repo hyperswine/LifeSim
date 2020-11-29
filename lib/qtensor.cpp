@@ -80,8 +80,10 @@ void qvec::print_vec(){
     }
     std::cout << "==End vector\n" << std::endl;
 }
-qvec qvec::operator[](odd_even type){
-    if(type == ODD_T){
+qvec qvec::operator[](ODD_EVEN type) const{
+    if(len()==1) return qvec(*this);
+
+    if(type.even == false){
         qvec res(std::floor(len()/2));
         for(int i=1; i<len(); i+=2)
             res[i] = vec[i];

@@ -13,7 +13,7 @@ using namespace RAND_ENG;
 // The function f(x0, x1, x2...) that maps to some a real number r
 quadruple sample_I(const qvec& input){
     // in this sample, we map n input values into a 3-period of sin(x_0) + cos(x_1) + ..
-    quadruple sum;
+    quadruple sum = 0;
 
     for(int i=0; i< input.len(); i++){
         // if(i%2==0) sum += sin(input[i]);
@@ -27,7 +27,7 @@ quadruple sample_I(const qvec& input){
 // The function f(x0, x1, x2...) that maps to some a real number r
 quadruple hard_sample_I(const qvec& input){
     // in this sample, we map n input values into a 3-period of sin(x_0) + cos(x_1) + tan(x_3) + sin(x_4) +...
-    quadruple sum;
+    quadruple sum = 0;
 
     for(int i=0; i< input.len(); i++){
         // if(i%3==0)

@@ -1,0 +1,10 @@
+// simply include this for every other header
+#pragma once
+
+#include "hyper_math/ctensor.h"
+#include "hyper_math/fcomplex.h"
+#include "hyper_math/fourier_field.h"
+#include "hyper_math/hypmath.h"
+#include "hyper_math/num_calculus.h"
+#include "hyper_math/qtensor.h"
+#include "hyper_math/rng_engine.h"

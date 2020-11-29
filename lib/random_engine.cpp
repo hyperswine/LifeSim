@@ -3,6 +3,7 @@
 #include "hyper_math/rng_engine.h"
 #include "hyper_math/qtensor.h"
 #include <chrono>
+#include <random>
 
 using namespace RAND_ENG;
 
@@ -102,6 +103,14 @@ qmatrix RNG::gen_randmatrix(int n, int m, int a, int b) {
         }
     }
 
+    return res;
+}
+
+qvec RNG::gen_normvec(int n, int mu, int sigma){
+    std::normal_distribution<quadruple> norm_dist(mu, sigma);
+    qvec res(n);
+    for(int i=0; i<n; i++) res[i] = norm_dist(generator);
+    
     return res;
 }
 

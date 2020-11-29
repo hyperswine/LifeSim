@@ -6,6 +6,7 @@
 #include "hyper_math/hypmath.h"
 #include "hyper_math/rng_engine.h"
 #include "tester.h"
+#include <iostream>
 
 using namespace RAND_ENG;
 
@@ -34,6 +35,8 @@ public:
     cvec& cv1 = _rng.gen_cvec(10);
     cvec& cv2 = _rng.gen_cvec(16, -1, 1);
     cvec& cv3 = cvec(10);
+    qvec& qv1 = _rng.gen_randvec(16, -1, 1);
+    qvec& qv2 = _rng.gen_normvec(16, 0, 1);
 
     tfixture_dft(){}
     ~tfixture_dft(){}
@@ -73,11 +76,17 @@ void test_complex_basic(){
 }
 
 void test_dft(){
-    tfixture_1 _t;
-    _t.qv1.print_vec();
-    _t.qv1.print_vec();
+    tfixture_dft _t;
+    _t.qv2.print_vec();
 
-    cvec res = dft(_t.qv1);
-
+    cvec res = dft(_t.qv2);
+    res.print_vec();
 }
 
+void test_fft(){
+    tfixture_dft _t;
+    _t.qv2.print_vec();
+
+    cvec res = fft_v1(_t.qv2);
+    res.print_vec();
+}
