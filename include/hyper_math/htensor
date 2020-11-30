@@ -1,24 +1,80 @@
-// Tensors, N-dimensional
+// Tensors, N-dimensional. --dimensional=a single double/quad/int, 1-dimensional = vector, 2-d = matrix
 // In-progress -> requires extra testing
 // ALSO dont forget to include in CMakeLists.txt!
 #pragma once
 #include "hypmath.h"
 
-// class htensor;
-// template<class T> class hvec;
-// template<class T> class hmatrix;
+template<class T> class htensor;
+// template<class T> class hsingle : public htensor;
+template<class T> class hvec : public htensor;
+template<class T> class hmatrix : public htensor;
 
-// class htensor{
-// public:
-//     int n_dimensions;
-//     int* dimensions;
+template<class T> class htensor{
+private:
+    int n_dimensions; // dimensions must be the same for addition, subtraction, tensor product and elementwise operators
+    // when transposing, ensure to update these dimensions accordingly, also the T* values as well. For simplicity sake
+    // the transpose() is a virtual function so subclasses can implement them without causing any large rooms for failure.
+    int* dimensions; // array of dimensions. If n=4, then dimensions has 4 indexes e.g. dimensions ] {1, 4, 2, 5}, e.g. a 1x4x2x5 tensor
+    // In general, if a_1 x a_2 x a_3 x ... a_n dimensions, then getting a specific index is sizeof(T*) * a_1 * a_2 * ... * a_(n-1) + a_n
+    T* values; // values, note if tensor is 2d then number of indices = n x m. calculate the [n,m] by doing sizeof(T*) * n + m.
 
-// private:
-//     htensor(int n_dim);
-//     ~htensor();
+public:
 
-//     // common operators
+    htensor();
+    // creates a vector of size n with zeros, otherwise don't initialize
+    htensor(int n_dim, bool zeros=true);
+    // copy constructor for return value optimization
+    htensor(const htensor&);
+    // delete all data structures dynamically allocated by htensor
+    ~htensor();
 
-//     // useful operations
-// };
+    // when applied to anything like a matrix or higher dimensional tensors, will loop through row by row and etc.
+    // I.e. loops through 0th, 1th, ... n-1th dimension
+    T* begin();
+    T* end();
+
+    virtual void transpose() = 0; // does nothing to 0-dimensional tensors
+    int n_dim(); // n dimensions
+    int* dim(); // length of each dimension, note uses static allocation
+    // provide n args for n dimensions
+    virtual void resize(int...) = 0;
+    virtual void print() = 0;
+
+    //////////////////////
+    //  UTILITY OPERATORS
+    //////////////////////
+
+    virtual htensor operator[](ODD_EVEN) const = 0; // take the odd or even terms from the nth dimension. For matrices, this takes odd and even rows
+    virtual htensor& operator[](int& i) const = 0;
+    virtual htensor& operator[](int&& i) const = 0; // array access -> supports negative indexes
+    virtual void operator=(T*) = 0; // assign a new  T* -> Must only be used when you know exactly the size and type, but can definitely be used in subclasses
+    virtual void operator=(htensor& oth_vec) = 0; // assign to a new tensor of the same number of dimensions. Old T* array is deleted
+    
+    /////////////////////////
+    // ELEMENTWISE OPERATORS
+    /////////////////////////
+
+    bool operator!=(const htensor& oth_tensor){
+        
+    }
+    // for 0-dimensional tensors, this works
+    virtual bool operator==(const T& c){return c==T[0];}
+    virtual bool operator==(const htensor&) const = 0; //elementwise comparison; also, if not the same dimensions -> return false.
+    virtual htensor operator+(const htensor&) = 0; //elementwise addition
+    virtual htensor operator-(const htensor&) = 0; //elementwise subtraction
+    virtual htensor operator/(const htensor&) = 0; //elementwise division
+    virtual htensor operator*(const T&) = 0; //elementwise multiplication l-value
+    virtual htensor operator*(const T&&) = 0; //elementwise multiplication r-value
+    virtual htensor operator*(const htensor&) = 0; //inner product
+    virtual htensor operator&(const htensor&) = 0; //tensor (outer) product
+    virtual htensor operator|(const htensor&) = 0; // distance between this vector and the other one.
+
+    // NOTE: lvalue-rvalue overloads usually have the same code defined as a macro
+};
+
+template<class T> class hsingle : public htensor{
+public:
+
+
+};
 

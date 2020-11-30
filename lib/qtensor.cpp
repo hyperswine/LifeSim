@@ -85,16 +85,16 @@ qvec qvec::operator[](ODD_EVEN type) const{
 
     if(type.even == false){
         qvec res(std::floor(len()/2));
-        for(int i=1; i<len(); i+=2)
-            res[i] = vec[i];
+        for(int i=1, j=0; i<len(); i+=2, j++)
+            res[j] = vec[i];
 
         return res;
     }
     else{
         qvec res(std::ceil(len()/2));
 
-        for(int i=0; i<len(); i+=2)
-            res[i] = vec[i];
+        for(int i=0, j=0; i<len(); i+=2, j++)
+            res[j] = vec[i];
 
         return res;
     }

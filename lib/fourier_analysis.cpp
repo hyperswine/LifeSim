@@ -6,8 +6,8 @@
 
 #define IS_INT(x) (std::floor(x) == x)
 // C unfortunately compiles char*/strings as ints. This is a temporary solution.
-ODD_EVEN even_t{true};
-ODD_EVEN odd_t{false};
+const ODD_EVEN even_t{true};
+const ODD_EVEN odd_t{false};
 
 /**
  * Brute force DFT O(n^2). Based on the fact that x(hat)_k = sum(x_k * e^{-i*2pi*k*j/N} for j=0..N-1)
@@ -59,7 +59,7 @@ cvec fft_v1(const qvec& x){
         // join them together
         for(int k=0; k<N/2; k++){
             res[k] += _even[k] + _odd[k] * w;
-            res[N/2+k] += _even[k] + _odd[k] * w;
+            res[N/2+k] += _even[k] +_odd [k] * w;
             w = complexv(2*c_pi*k/N) * w;
         }
         return res;

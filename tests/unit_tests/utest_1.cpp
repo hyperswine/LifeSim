@@ -15,15 +15,15 @@ Tester _tester;
 
 class tfixture_1{
 public:
-    qvec& qv1 = _rng.gen_randvec(100);
-    qvec& qv2 = _rng.gen_randvec(100);
-    qvec& qv3 = _rng.gen_randvec(5);
-    qmatrix& qm1 = _rng.gen_randmatrix(5, 5);
-    qmatrix& qm2 = _rng.gen_randmatrix(5, 5);
-    complexv& cpx1 = complexv(4);
-    complexv& cpx2 = complexv(2);
-    cvec& cv1 = cvec(10);
-    cvec& cv2 = cvec(10);
+    qvec qv1 = _rng.gen_randvec(100);
+    qvec qv2 = _rng.gen_randvec(100);
+    qvec qv3 = _rng.gen_randvec(5);
+    qmatrix qm1 = _rng.gen_randmatrix(5, 5);
+    qmatrix qm2 = _rng.gen_randmatrix(5, 5);
+    complexv cpx1 = complexv(4);
+    complexv cpx2 = complexv(2);
+    cvec cv1 = cvec(10);
+    cvec cv2 = cvec(10);
 
     tfixture_1(){}
     ~tfixture_1(){}
@@ -32,11 +32,11 @@ public:
 
 class tfixture_dft{
 public:
-    cvec& cv1 = _rng.gen_cvec(10);
-    cvec& cv2 = _rng.gen_cvec(16, -1, 1);
-    cvec& cv3 = cvec(10);
-    qvec& qv1 = _rng.gen_randvec(16, -1, 1);
-    qvec& qv2 = _rng.gen_normvec(16, 0, 1);
+    cvec cv1 = _rng.gen_cvec(10);
+    cvec cv2 = _rng.gen_cvec(16, -1, 1);
+    cvec cv3 = cvec(10);
+    qvec qv1 = _rng.gen_randvec(16, -1, 1);
+    qvec qv2 = _rng.gen_normvec(16, 0, 1);
 
     tfixture_dft(){}
     ~tfixture_dft(){}
@@ -75,18 +75,26 @@ void test_complex_basic(){
     cv_res.print();
 }
 
-void test_dft(){
-    tfixture_dft _t;
-    _t.qv2.print_vec();
+tfixture_dft _t_global;
 
-    cvec res = dft(_t.qv2);
-    res.print_vec();
+void test_dft(){
+    // tfixture_dft _t;
+    // _t.qv2.print_vec();
+
+    // cvec res = dft(_t.qv2);
+    // res.print_vec();
+
+    _t_global.qv2.print_vec();
+    dft(_t_global.qv2).print_vec();
 }
 
 void test_fft(){
-    tfixture_dft _t;
-    _t.qv2.print_vec();
+    // tfixture_dft _t;
+    // _t.qv2.print_vec();
 
-    cvec res = fft_v1(_t.qv2);
-    res.print_vec();
+    // cvec res = fft_v1(_t.qv2);
+    // res.print_vec();
+
+    _t_global.qv2.print_vec();
+    fft_v1(_t_global.qv2).print_vec();
 }
