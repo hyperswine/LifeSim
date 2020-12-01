@@ -59,6 +59,7 @@ public:
     //////////////////////
 
     virtual htensor operator[](ODD_EVEN) const = 0; // take the odd or even terms from the nth dimension. For matrices, this takes odd and even rows
+    // sould act like a recursive indexer, at dimension = 0, should return T
     virtual htensor& operator[](int& i) const = 0;
     virtual htensor& operator[](int&& i) const = 0; // array access -> supports negative indexes
     virtual void operator=(T*) = 0; // assign a new  T* -> Must only be used when you know exactly the size and type, but can definitely be used in subclasses
