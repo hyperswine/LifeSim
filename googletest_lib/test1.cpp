@@ -11,8 +11,14 @@ TEST(dft_tests, dft) {
 }
 
 TEST(htensors, h1){
-    hsingle<int> hs;
+    hsingle<> hs;
     hs.print();
 
     std::cout << "Succesfully created hsingle and called hs.print()\n";
+
+    hmatrix<> hm;
+    hm.print();
+    std::cout << hm(0,0) << " " << hm(0,1) << " " << hm(1,0) << " " << hm(1,1) << std::endl;
+
+    std::cout << "Succesfully created hmatrix and called hm.print()\n";
 }

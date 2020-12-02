@@ -17,14 +17,16 @@ template<std::size_t> struct hwrap{
 
 // T can either be a numeric (int, double) or complex. They all require most basic arithmetic operators.
 template<class T> class htensor {
-private:
-    int n_dimensions; // dimensions must be the same for addition, subtraction, tensor product and elementwise operators
-    // when transposing, ensure to update these dimensions accordingly, also the T* values as well. For simplicity sake
-    // the transpose() is a virtual function so subclasses can implement them without causing any large rooms for failure.
-    int* dimensions; // array of dimensions. If n=4, then dimensions has 4 indexes e.g. dimensions ] {1, 4, 2, 5}, e.g. a 1x4x2x5 tensor
-    int n_values; // number of total values, i.e. sum of all dimensions
-    // In general, if a_1 x a_2 x a_3 x ... a_n dimensions, then getting a specific index is sizeof(T*) * a_1 * a_2 * ... * a_(n-1) + a_n
-    T* values; // values, note if tensor is 2d then number of indices = n x m. calculate the [n,m] by doing sizeof(T*) * n + m.
+protected:
+    // dimensions must be the same for elementwise operators
+    int n_dimensions;
+    // array of dimensions. If n=4, then dimensions has 4 indexes e.g. dimensions ] {1, 4, 2, 5}, e.g. a 1x4x2x5 tensor
+    int* dimensions;
+    // number of total values, i.e. sum of all dimensions
+    int n_values;
+    // a_1 x a_2 x a_3 x ... a_n dimensions -> indexing: (dimensions[1] * a_1 * dimensions[2] a_2 * ...) + a_n
+    // NOTE: if tensor is 2d then number of indices = n x m. calculate the [n,m] by doing sizeof(T*) * n + m.
+    T* values;
 
 public:
     // creates a vector tensor with value [0, 0]
@@ -132,6 +134,7 @@ public:
     //     }
     //     return res;
     // }
+    
     // Provide n args for n dimensions. User should know how many dimensions a tensor has, before using this.
     // Args should be in the order of n-1...0, where the n-1th dimension is the highest. E.g. (rows, columns).
     // If giving too many or too little args, then returns the 0th indexed element or up the maximum number allowed.
@@ -147,25 +150,29 @@ public:
         for(int i=0; i<n_dimensions; i++){
             int dim_i = va_arg(args, int);
             if(dimensions[n_dimensions-1-i] > dim_i) throw OUT_OF_BOUNDS;
-            indexer += dim_i * (i==n_dimensions-1)? dimensions[n_dimensions-1-i]: 1;
+            // so we want T[d1*i, d2*j, d3*k, ..., dn*n]
+            indexer += dim_i * (i!=n_dimensions-1)? dimensions[n_dimensions-1-i]: 1;
         }
 
         va_end(args);
         return values[indexer];
     }
-    // returns a new htensor of 1 dimension lower. Note if number of dimensions = 0, then simply returns a copy of itself.
-    virtual htensor operator[](int& i){
-        if (i>=dimensions[n_dimensions-1]) throw OUT_OF_BOUNDS;
+    // returns subtensor, i.e. a new htensor of 1 dimension lower. Note if number of dimensions = 0, then simply returns a copy of itself.
+    virtual htensor operator[](int i){
+        if (i<0 || i>=dimensions[n_dimensions-1]) throw OUT_OF_BOUNDS;
 
-        int indexer = i % dimensions[n_dimensions-1];
-        return values[indexer];
-    }
-    // rvalue optimization for some cases where you want to simply index by a constant, e.g. m[5].
-    virtual htensor<T> operator[](int&& i){
-        if (i>=dimensions[n_dimensions-1]) throw OUT_OF_BOUNDS;
+        if(n_dimensions==0) return htensor(*this);
 
-        int indexer = i % dimensions[n_dimensions-1];
-        return values[indexer];
+        htensor res(n_dimensions - 1);
+        int range_index[2] = {n_values-dimensions[n_dimensions-1], 0};
+
+        // TODO: return everything from 1...n
+        // for(int j = 1; j < n_dimensions-1; j++){
+        //     if(j==1) range_index += i*dimensions[j];
+        //     else range_index += dimensions[j];
+        // }
+
+        return res;
     }
     virtual void operator=(T*){ return; } // assign a new  T* -> Must only be used when you know exactly the size and type, but can definitely be used in subclasses
     virtual void operator=(htensor& oth_vec){ return; } // assign to a new tensor of the same number of dimensions. Old T* array is deleted
@@ -226,13 +233,57 @@ public:
 
 // DEFINITELY MAKES SENSE TO USE THE BELOW for overriding
 
-template<class T> class hsingle : public htensor<T> {
+template<class T=quadruple> class hsingle : public htensor<T> {
 public:
     hsingle(){}
     ~hsingle(){}
     void print(){ return; }
-    void operator=(T*){ return; }
+    void operator=(T* t){ return; }
     void operator=(htensor& oth_vec){ return; }
 };
-template<class T> class hvec : public htensor<T> {};
-template<class T> class hmatrix : public htensor<T> {};
+
+template<class T=quadruple> class hvec : public htensor<T> {
+private:
+    bool column_vec = false;
+public:
+    hvec(){}
+    ~hvec(){}
+
+    void print(){ return; }
+    // returns a transposed T
+    hvec T(){ hvec res(*this); res.column_vec = !column_vec; return res;}
+
+    void operator=(T* t){ return; }
+    void operator=(htensor& oth_vec){ return; }
+    T& operator()(int i){
+        if(i<0 || i>=n_values) throw OUT_OF_BOUNDS;
+        return values[i]; 
+    }
+};
+
+template<class T=quadruple> class hmatrix : public htensor<T> {
+public:
+    hmatrix(){
+        n_dimensions = 2;
+        dimensions = new int[n_dimensions];
+        dimensions[0] = 2;
+        dimensions[1] = 2;
+        n_values = 4;
+        values = new T[4];
+        values[0] = T(0);
+        values[1] = T(0);
+        values[2] = T(0);
+        values[3] = T(0);
+    }
+    // Zeros everything
+    hmatrix(int m, int n): htensor(2, m, n){}
+    ~hmatrix(){}
+    void print(){ return; }
+    void operator=(T* t){ return; }
+    void operator=(htensor& oth_vec){ return; }
+
+    T& operator()(int i, int j){
+        if(i<0 || j<0 || i>=dimensions[0] || j>=dimensions[1]) throw OUT_OF_BOUNDS;
+        return values[i*dimensions[0] + j];
+    }
+};
