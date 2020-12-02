@@ -4,9 +4,16 @@
 #pragma once
 #include "hypmath.h"
 
+#include <cstdarg>
+#include <vector>
+
 #define OP_TENSOR(operate) if(!equal_size(oth_tensor)) return false; htensor res(n_dimensions,); for(int i=0; i<len(); i++) res[i] = vec[i] operate oth_vec[i]; return res;
 #define OP_ELEM(operate) if(!equal_size(oth_tensor)) return false; htensor res(n_dimensions, dim()); for(int i=0; i<n_values; i++) res.values[i] = values[i] operate oth_tensor.values[i]; return res;
 #define ELEM_SCALAR(operate) htensor res(n_dimensions, dim()); for(int i=0; i<n_values; i++) res.values[i] = t operate res.values[i]; return res;
+// wrapper for varargs
+template<std::size_t> struct hwrap{
+    using type = std::size_t;
+};
 
 // T can either be a numeric (int, double) or complex. They all require most basic arithmetic operators.
 template<class T> class htensor {
@@ -14,33 +21,79 @@ private:
     int n_dimensions; // dimensions must be the same for addition, subtraction, tensor product and elementwise operators
     // when transposing, ensure to update these dimensions accordingly, also the T* values as well. For simplicity sake
     // the transpose() is a virtual function so subclasses can implement them without causing any large rooms for failure.
-    int* dimensions; // array of dimensions. If n=4, then dimensions has 4 indexes e.g. dimensions ] {1, 4, 2, 5}, e.g. a 1x4x2x5 tensor
+    std::vector<int> dimensions; // array of dimensions. If n=4, then dimensions has 4 indexes e.g. dimensions ] {1, 4, 2, 5}, e.g. a 1x4x2x5 tensor
     int n_values; // number of total values, i.e. sum of all dimensions
     // In general, if a_1 x a_2 x a_3 x ... a_n dimensions, then getting a specific index is sizeof(T*) * a_1 * a_2 * ... * a_(n-1) + a_n
-    T* values; // values, note if tensor is 2d then number of indices = n x m. calculate the [n,m] by doing sizeof(T*) * n + m.
+    std::vector<T> values; // values, note if tensor is 2d then number of indices = n x m. calculate the [n,m] by doing sizeof(T*) * n + m.
 
 public:
+    // creates a dim = [1] tensor with value 0
+    // Only works with types T that has '=(numeric)' operators.
+    htensor(){
+        n_dimensions = 0;
+        dimensions = std::vector(1);
+        dimensions[0] = T(0);
+        n_values = 1;
+    }
+    // creates a vector of size n with zeros, otherwise don't initialize values
+    template<typename ...Ints>
+    htensor(int n_dim, Ints...d, bool zeros = true){
+        n_dimensions = n_dim;
+        dimensions = std::vector(n_dim);
+        n_values = 0;
 
-    htensor();
-    // creates a vector of size n with zeros, otherwise don't initialize
-    htensor(int n_dim, int...args, bool zeros = true);
-    htensor(int n_dim, int* dims);
+        va_list args;
+        va_start(args, d);
+
+        // set number of each dimension
+        for (int i = 0; i< n_dimensions; i++){
+            int d_i = var_arg(args, int);
+            dimensions[i] = d_i;
+            n_values += d_i;
+        }
+
+        // set everything to 0
+        values = std::vector(n_values);
+        for (auto v: values) v = T(0);
+
+    }
+    // always zeros by default
+    htensor(int n_dim, int* dims){
+        n_dimensions = n_dim;
+        dimensions = std::vector(n_dim);
+        n_values = 0;
+
+        for(int i = 0; i< n_dimensions; i++) dimensions[i] = dims[i];
+        
+        values = std::vector(n_values);
+        for (auto v: values) v = T(0);
+    }
     // copy constructor for return value optimization
-    htensor(const htensor&);
+    htensor(const htensor& oth_tensor){
+        n_dimensions = oth_tensor.n_dimensions;
+        std::copy(oth_tensor.dimensions.begin(), oth_tensor.dimensions.end(), std::back_inserter(dimensions))
+        n_values = oth_tensor.n_values;
+
+        memmove(values, oth_tensor.values, sizeof(T) * n_values);
+    }
     // delete all data structures dynamically allocated by htensor
-    ~htensor();
+    // NOTE: for now, underlying structures are managed by std vec so no need to manually do anything
+    ~htensor(){}
 
     // when applied to anything like a matrix or higher dimensional tensors, will loop through row by row and etc.
     // I.e. loops through 0th, 1th, ... n-1th dimension
     T* begin(){return values;}
     T* end(){return values + n_values;}
     // NOTE: only works for 1-D and 2-D tensors
-    virtual void transpose() = 0; // does nothing to 0-dimensional tensors
+    virtual void transpose(){
+        return;
+    }
     int n_dim(){return n_dimensions} // n dimensions
     int* dim(){return dimensions} // length of each dimension, note uses static allocation
     // provide n args for n dimensions. Truncation and zero-appending are applied when new n_values doesnt match prev n_values
     // otherwise only thing that needs to change is dimensions -> which affects layout of tensor[] indexing
-    virtual void resize(int...) = 0;
+    template<typename ...Ints>
+    void resize(Ints...d);
     // only implemented for 0, 1, 2-d tensors
     virtual void print() = 0;
     // if same dimensions, return true
@@ -58,10 +111,55 @@ public:
     //  UTILITY OPERATORS
     //////////////////////
 
-    virtual htensor operator[](ODD_EVEN) const = 0; // take the odd or even terms from the nth dimension. For matrices, this takes odd and even rows
-    // sould act like a recursive indexer, at dimension = 0, should return T
-    virtual htensor& operator[](int& i) const = 0;
-    virtual htensor& operator[](int&& i) const = 0; // array access -> supports negative indexes
+    // take the odd or even terms from the nth dimension. For matrices, this takes odd and even rows
+    virtual htensor operator[](ODD_EVEN){
+        if(n_dimensions-1 ==0 || dimensions[n_dimensions-1]==1) return htensor(*this);
+
+        if(type.even == false){
+            htensor res(std::floor(n_dimensions()/2), dimensions);
+            for(int i=1, j=0; i<len(); i+=2, j++) res[j] = vec[i];
+        }
+        else{
+            htensor res(std::ceil(n_dimensions()/2), dimensions);
+            for(int i=0, j=0; i<len(); i+=2, j++) res[j] = vec[i];
+        }
+        return res;
+    }
+    // Provide n args for n dimensions. User should know how many dimensions a tensor has, before using this.
+    // Args should be in the order of n-1...0, where the n-1th dimension is the highest. E.g. (rows, columns).
+    // If giving too many or too little args, then returns the 0th indexed element or up the maximum number allowed.
+    template<typename... Ints>
+    T& operator()(Ints...d){
+        va_list args;
+        va_start(args, d);
+
+        // How to index for a specific T:
+        // 1. take the index of the n-1th dimension and multiply and dimensions[n-1]
+        // 2. do it for the rest of n-1-i, multiply dimensions[n-1-i] until i = n-1
+        int indexer = 0;
+        for(int i=0; i<n_dimensions; i++){
+            int dim_i = var_arg(args, int);
+            if(dimensions[n_dimensions-1-i] > dim_i) throw OUT_OF_BOUNDS;
+            indexer += dim_i * (i==n_dimensions-1)? dimensions[n_dimensions-1-i]: 1;
+        }
+
+        va_end(args);
+        return values[indexer];
+    }
+    // returns a new htensor of 1 dimension lower. Note if number of dimensions = 0, then simply returns a copy of itself.
+    virtual htensor operator[](int& i){
+        if (i>=dimensions[n_dimensions-1]) throw OUT_OF_BOUNDS;
+
+        int indexer = i % dimensions[n_dimensions-1];
+        return values[indexer];
+    }
+    // rvalue optimization for some cases where you want to simply index by a constant, e.g. m[5].
+    virtual htensor<T> operator[](int&& i){
+        if (i>=dimensions[n_dimensions-1]) throw OUT_OF_BOUNDS;
+
+        int indexer = i % dimensions[n_dimensions-1];
+        return values[indexer];
+    }
     virtual void operator=(T*) = 0; // assign a new  T* -> Must only be used when you know exactly the size and type, but can definitely be used in subclasses
     virtual void operator=(htensor& oth_vec) = 0; // assign to a new tensor of the same number of dimensions. Old T* array is deleted
 
@@ -70,6 +168,7 @@ public:
     // NOTE: cannot not instantiate a htensor, but can still treat scalars, vecs, matrices as htensors for intuitive usage.
     /////////////////////////
 
+    // Compares first element with another T. Works well for scalars. 
     bool operator==(const htensor& oth_tensor) {
         if (!equal_size(oth_tensor)) return false;
         // compare all elements
@@ -80,19 +179,18 @@ public:
     bool operator==(const T& c) { return c == T[0]; }
     //elementwise comparison; also, if not the same dimensions -> return false.
     virtual bool operator!=(const htensor& oth_tensor) const { return !(*this == oth_tensor); }
-    //elementwise addition
     virtual htensor operator+(const htensor& oth_tensor) const { OP_ELEM(+) }
-    //elementwise subtraction
     virtual htensor operator-(const htensor& oth_tensor) const { OP_ELEM(-) }
-    //elementwise division
     virtual htensor operator/(const htensor& oth_tensor) const { OP_ELEM(/) }
-    //elementwise multiplication l-value
+    // l-value optimization
     virtual htensor operator*(const T& t) const { ELEM_SCALAR(*) }
-    //elementwise multiplication r-value
+    // r-value optimization
     virtual htensor operator*(const T&& t) const { ELEM_SCALAR(*) }
     // standard product. If between two vectors -> scalar product (same as ',' operator), if between two matrices -> matrix multiplication
     // If between matrix and vector -> matrix vector multiplication.
-    virtual htensor operator*(const htensor& oth_tensor) const = 0;
+    virtual htensor operator*(const htensor& oth_tensor) const { 
+        return htensor(1, 1);
+    }
     //inner product, basically maps from R^n -> R^1
     virtual htensor operator,(const htensor& oth_tensor) const {
         if (!equal_size(oth_tensor)) return false;
@@ -121,6 +219,10 @@ public:
 
 // DEFINITELY MAKES SENSE TO USE THE BELOW for overriding
 
-template<class T> class hsingle : public htensor<T> {};
+template<class T> class hsingle : public htensor<T> {
+public:
+    hsingle();
+    ~hsingle();
+};
 template<class T> class hvec : public htensor<T> {};
 template<class T> class hmatrix : public htensor<T> {};
