@@ -14,8 +14,6 @@ const int MEMORY_ERROR = -4;
 const int INVALID_OP = -5;
 const int STACK_LIMIT = 50000; // Arbitrary Limit: we should not be storing anything more than this value in a vector
 const int DEFAULT_THREADS = 16;
-// const std::string ODD_T = "odd";
-// const std::string EVEN_T = "even";
 
 typedef struct _odd_even{
     bool even = true;
@@ -23,6 +21,11 @@ typedef struct _odd_even{
 
 // factorial -> 20! limit
 long int fact(const int& x);
+
+// pth root -> 18 s.f. Uses 'shifting nth root algorithm'
+inline quadruple p_root(quadruple x, int p);
+
+inline quadruple abs_r(quadruple r_i, quadruple r_j);
 
 // trig functions based on taylor series expansion of 10 terms
 double c_sin(double);

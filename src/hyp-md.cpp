@@ -6,6 +6,10 @@
 #include <iostream>
 using namespace std;
 
+enum POTENTIALS{
+    LJ, BHM, CUST
+};
+
 const quadruple argon_eps = 3.4e-8;
 const quadruple argon_sigma = 1.7e-14;
 
@@ -54,11 +58,15 @@ quadruple argon_pot(qvec r_i, qvec r_j){
 // TODO: this function
 // compute total forces from all particles, which is basically the partial derivative of the sum of their potential functions
 // can think of it as the entire potential energy of the system
-quadruple force_potential(qmatrix pos, int index){
+quadruple force_potential(qmatrix pos, int index, quadruple r_c){
     // for a given position to other all positions, compute potential(pos(i), pos(i+1..N))
     quadruple accum_v = 0;
     for(int i=0; i<pos.rows()-2; i++){
         for(int j=i+1; j<pos.cols()-1; j++){
+            // if distance is greater than a cutoff value, apply ewald summation
+            if (abs_r(pos[i], pos[j]) > r_c){
+                accum_v += ewald_sum(LJ, pos[i], pos[j]);
+            }
             // accumulate potential(pos(i), pos(j))
             accum_v += argon_pot(pos[i], pos[j]);
         }

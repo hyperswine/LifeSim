@@ -1,8 +1,4 @@
-#include "hyper_math/fourier_field.h"
-#include "hyper_math/ctensor.h"
-#include "hyper_math/hypmath.h"
-#include "backend.h"
-#include <cmath>
+#include "hmath"
 
 #define IS_INT(x) (std::floor(x) == x)
 // C unfortunately compiles char*/strings as ints. This is a temporary solution.
@@ -66,9 +62,37 @@ cvec fft_v1(const qvec& x){
     }    
 }
 
+
+
+hvec<> fft_v2(const hvec<>& x){
+    int N = x.len();
+    // quick append -> happens at most once on call
+    if(!IS_INT(log2(N))) N = pow(2, ceil(log2(N)));
+    
+    if(N == 2) return dft(x);
+    
+    // the magic
+    else{
+        hvec<> res(N);
+        // call fft on even terms
+        hvec<> _even = fft_v1(x[even_t]);
+        // call fft on odd terms
+        hvec<> _odd = fft_v1(x[odd_t]);
+    
+        complexv w(1, 0);
+        // join them together
+        for(int k=0; k<N/2; k++){
+            res[k] += _even[k] + _odd[k] * w;
+            res[N/2+k] += _even[k] +_odd [k] * w;
+            w = complexv(2*c_pi*k/N) * w;
+        }
+        return res;
+    }
+}
+
 // Take in a series of points and a function that maps the points
 // Returns the DFT of {f} on {x}
-// cvec fft_v2(const qvec& x, (void*)(quadruple) f_x){
+// cvec fft_v3(const qvec& x, (void*)(quadruple) f_x){
 //     qvec mapped_f(x.len());
 
 //     // apply f_x to all x

@@ -1,11 +1,24 @@
 // Boundary conditions -> reflective boundary or periodic boundary.
 // note: ewald summation required for large simulation boxes with electrostatic forces
+#include "hmath"
 
 /**
  * Apply a reflective force that pushes particles into the middle
  */
 void apply_reflective(){
     return;
+}
+
+/**
+ * Initialize k three-dimensional cells of N atoms each.
+ * Main cell is always 0th indexed
+ */
+CELL_LIST* initialize_cells(int N, int k_cells){
+    CELL_LIST* cl = new CELL_LIST;
+    cl->all_cells = new CELL[k_cells];
+    cl->N = N;
+
+    return cl;
 }
 
 /**

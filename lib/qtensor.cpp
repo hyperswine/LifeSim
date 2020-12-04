@@ -3,7 +3,6 @@
 #include "backend.h"
 #include <string>
 #include <any>
-#include <cmath>
 #include <iostream>
 
 #define zero_vec(x, n) memset(x, 0, n*sizeof (quadruple))
