@@ -50,7 +50,6 @@ quadruple sample_mc_integral(int n_gen){
     qvec out(n_gen); //output points (f(x) vals)
 
     // generate random points in d-hypercube
-    // HOW TO BOUND THE SPACE?
     // for(int i=0; i<n_gen; i++){
     //     qvec in = _rng.gen_randvec(d_input, -1, 1);
     //     out[i] = sample_I(in);
