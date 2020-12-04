@@ -1,5 +1,4 @@
 #include "hyper_math/hypmath.h"
-#include <cmath>
 
 long int fact(const int& x){
     if(x<=1) return 1;

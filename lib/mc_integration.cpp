@@ -5,7 +5,6 @@
 #include "hyper_math/rng_engine.h"
 #include "mc_methods.h"
 #include <any>
-#include <cmath>
 
 using namespace std;
 using namespace RAND_ENG;

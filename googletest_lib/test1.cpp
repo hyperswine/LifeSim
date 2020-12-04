@@ -22,3 +22,7 @@ TEST(htensors, h1){
 
     std::cout << "Succesfully created hmatrix and called hm.print()\n";
 }
+
+TEST(generic, one){
+    std::cout << "pth root of 1000: " << p_root(1000, 5) << std::endl;
+}

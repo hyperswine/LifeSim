@@ -75,7 +75,8 @@
         "cstdarg": "cpp",
         "utests_x": "cpp",
         "htensor": "cpp",
-        "hmath": "cpp"
+        "hmath": "cpp",
+        "hypmd": "cpp"
     },
     "cSpell.words": [
         "complexv",

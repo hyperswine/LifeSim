@@ -5,7 +5,6 @@
 #include "hypmath.h"
 
 #include <cstdarg>
-#include <vector>
 
 #define OP_TENSOR(operate) if(!equal_size(oth_tensor)) return false; htensor res(n_dimensions,); for(int i=0; i<len(); i++) res[i] = vec[i] operate oth_vec[i]; return res;
 #define OP_ELEM(operate) if(!equal_size(oth_tensor)) return false; htensor res(n_dimensions, dim()); for(int i=0; i<n_values; i++) res.values[i] = values[i] operate oth_tensor.values[i]; return res;
@@ -16,7 +15,7 @@ template<std::size_t> struct hwrap{
 };
 
 // T can either be a numeric (int, double) or complex. They all require most basic arithmetic operators.
-template<class T> class htensor {
+template<class T=quadruple> class htensor {
 protected:
     // dimensions must be the same for elementwise operators
     int n_dimensions;
@@ -206,14 +205,14 @@ public:
         return htensor(1, 1);
     }
     //inner product, basically maps from R^n -> R^1
-    virtual htensor operator,(const htensor& oth_tensor) {
+    virtual T operator,(const htensor& oth_tensor) {
         if (!equal_size(oth_tensor)) return false;
         // create a htensor with the same dimensions
-        htensor res(1, 1);
+        quadruple sum = 0;
 
-        for (int i = 0; i < n_values; i++) res.values[0] += values[i] * oth_tensor.values[i];
+        for (int i = 0; i < n_values; i++) sum += values[i] * oth_tensor.values[i];
 
-        return res;
+        return sum;
     }
     //tensor (outer) product
     // NOTE: only works for vectors and matrices at this moment
@@ -247,17 +246,24 @@ private:
     bool column_vec = false;
 public:
     hvec(){}
+    hvec(int x){htensor(1, x);}
     ~hvec(){}
 
     void print(){ return; }
     // returns a transposed T
-    hvec T(){ hvec res(*this); res.column_vec = !column_vec; return res;}
+    hvec T(){ hvec res(*this); res.column_vec = !column_vec; return res; }
 
-    void operator=(T* t){ return; }
-    void operator=(htensor& oth_vec){ return; }
-    T& operator()(int i){
-        if(i<0 || i>=n_values) throw OUT_OF_BOUNDS;
-        return values[i]; 
+    // void operator=(T* t){ return; }
+    // void operator=(htensor& oth_vec){ return; }
+    // T& operator()(int i){
+    //     if(i<0 || i>=n_values) throw OUT_OF_BOUNDS;
+    //     return values[i]; 
+    // }
+    // get the kth norm
+    quadruple operator|(int norm_k){
+        quadruple sum = 0;
+        for(int i=0; i<n_values; i++) sum += pow(abs(values[i]), norm_k);
+        return p_root(sum, norm_k);
     }
 };
 
@@ -279,6 +285,9 @@ public:
     hmatrix(int m, int n): htensor(2, m, n){}
     ~hmatrix(){}
     void print(){ return; }
+    int rows(){ return dimensions[0]; }
+    int cols(){ return dimensions[1]; }
+
     void operator=(T* t){ return; }
     void operator=(htensor& oth_vec){ return; }
 
@@ -287,3 +296,9 @@ public:
         return values[i*dimensions[0] + j];
     }
 };
+
+///////////////
+//  UTILITIES
+///////////////
+
+void matrix_splitter(hmatrix<>, ...);

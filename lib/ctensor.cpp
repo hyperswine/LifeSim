@@ -1,6 +1,5 @@
 #include "hyper_math/fcomplex.h"
 #include "hyper_math/ctensor.h"
-#include <cmath>
 #include <iostream>
 
 #define init_vec(n) {column_vec = true; vec = new complexv[n]; cur_size = n;}

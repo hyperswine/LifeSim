@@ -1,0 +1,31 @@
+#pragma once
+
+#include "hmath"
+
+typedef struct __cell{
+    // Matrix of N x 3, of all positions of the particles in the cell
+    qmatrix M;
+
+} CELL;
+
+typedef struct __cell_list{
+    // x, y, z ranges
+    quadruple x[2];
+    quadruple y[2];
+    quadruple z[2];
+    
+    // e.g. cell[0] -> cell[0][0][0] represents the main cell
+    // cell[5] -> cell[5/k_cells + r]. The user doesn not have to worry about cell arithmetic,
+    // ewald summation automatically computes nearest image of all possible cells
+    CELL* all_cells;
+
+    int k_cells;
+
+    // N particles in the cell
+    int N;
+
+    CELL* operator[](int i){ return all_cells[i]; }
+    CELL* begin() { return all_cells; }
+    CELL* end() { return all_cells + k_cells; }
+
+} CELL_LIST;

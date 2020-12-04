@@ -38,3 +38,9 @@ void naive_md(int n_particles, int n_timesteps, int a=-1, int b=1, bool output_f
 // simulation in a two-dimensional simulation plane.
 // is a decent approximation for specific types of materials, e.g. compounds in catalysis
 qmatrix md_2d();
+
+/**
+ * In - N three-dimension vectors of all positions
+ * Out - Lower triangular matrix of potentials 
+ */
+void particle_ewald();
