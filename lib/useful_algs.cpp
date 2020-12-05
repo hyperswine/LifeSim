@@ -2,6 +2,8 @@
 #include "mc_methods.h"
 
 #include <utility>
+#include <vector>
+#include <string>
 
 #define MIN(a,b) (a > b) ? a : b
 
@@ -137,9 +139,81 @@ hvec<> metropolis_alg(hvec<> states, hmatrix<> m_dist, int n_samples){
     }
 }
 
-// randomized min cut of ADT struct
+// Find the next prime >= num.
+// If num is prime, then returns num.
+static int find_next_prime(int num){
+    // assume that a negative number was a mistake
+    if(num < 0) num = -num;
+    if(num <= 2) return 3; // not the worst idea
+
+    int l = num;
+    bool flag = false;
+    while(flag == false){
+        flag = true;
+        for(int i=2; i<ceil(sqrt(l)); i++){
+            if(l%i == 0){
+                flag = false;
+                l++;
+                break;
+            }
+        }        
+    }
+
+    return l;
+}
+
+const int ascii_size = 256;
 
 // universal/randomized hashing, perfect hashing
+// each key must differ in at least one location
+void perfect_hash(std::vector<std::string> x){
+    int M = ascii_size;
+
+    // take the max length of the strings = k
+    int k = 0;
+    for(int i=0; i<x.size(); i++){
+        if(x[i].length() > k) k = x[i].length();
+    }
+
+    // represent each key x as a vector of integers, where each integer <= M-1
+    std::vector<std::vector<int>> x_s;
+    for(int i=0; i<x.size(); i++){
+        for(int j=0; j<x[i].length(); i++){
+            x_s[i][j] = atoi(x[i][j]);
+        }
+    }
+
+    // generate a random r vector of length k, where each integer in [0, M-1]
+    std::vector<int> r;
+    RAND_ENG::RNG rng;
+    for(int i=0; i<k; i++){
+        r.push_back(rng.gen_int(0, M-1));
+    }
+    
+    // find some prime p, where p >= M
+    int p = find_next_prime(M);
+
+    // for all keys x
+    //  compute the hash index h(x) = r_1*x_1 + r_2*x_2 + ... + r_k*x_k (mod M)
+    std::vector<int> hash_indexes;
+    for(int i=0; i<x.size(); i++){
+        int res = (r * x_s[i]) % p;
+        hash_indexes.push_back(res);
+    }
+    
+    // evaulate the indexes assigned to all keys
+    // if there exists a conflict on a certain index i, hash again using the previous algorithm with random r vectors again
+    for(int i=0; i<p; i++){
+        int n_hits = 0;
+        for (int j = 0; j <hash_indexes.size(); j++){
+
+        }
+        // if n hits > 1, then conflict on index i and thus make a second level hash table.
+    }
+}
+
+// randomized min cut of ADT struct
+
 
 // pagerank of ADT struct
 

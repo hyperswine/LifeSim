@@ -1,0 +1,3 @@
+#pragma once
+
+int acc_contention(const int N, const int T);
