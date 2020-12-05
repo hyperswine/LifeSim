@@ -1,4 +1,6 @@
 #include "hmath"
+#include "mc_methods.h"
+
 #include <utility>
 
 #define MIN(a,b) (a > b) ? a : b
@@ -57,6 +59,82 @@ void svd(hmatrix<quadruple> M){
     // QU method for eigenvalues and eigenvectors?
 
     // QR or Gaussian decomposition for Null Space
+}
+
+/**
+ * Useful for generating a random state from a vector of states each with a probability
+ * In - A vector of probabilities, each being between (0, 1)
+ * Out - A cumulative distribution starting from i=0 to i=n-1
+ */
+static hvec<> gen_cumulative_dist(hvec<> weighted_states){
+    hvec cumulative_states(weighted_states.len());
+    quadruple cumulative_sum = 0;
+
+    for(int i=0; i<weighted_states.len(); i++){
+        cumulative_sum += weighted_states(i);
+        cumulative_states(i) = cumulative_sum;
+    }
+
+    return cumulative_states;
+}
+
+/**
+ * Generate a state s, where s in [0, 1...n] sfrom a cumulative distribution c.
+ */
+static quadruple gen_state(hvec<> c_dist){
+    RAND_ENG::RNG rng;
+    quadruple sample_weight = rng.gen_quad(0, 1);
+    quadruple sample = 0;
+
+    for(int i=0; i<c_dist.len(); i++){
+        if(c_dist(i) <= sample_weight){
+            sample = i;
+            break;
+        }
+    }
+
+    return sample;
+}
+
+/**
+ * A sample function that maps R -> R, making a normally distributed targe density
+ */
+static quadruple norm_density(){
+    return 0;
+}
+
+/**
+ * An efficient sampling of a search space. For highly dense areas, have higher chance to stay,
+ * for lowly dense areas, likely to move to another state. Result is a reasonable approximation
+ * of some density function.
+ * NOTE: test on the normal distribution.
+ */
+hvec<> metropolis_alg(hvec<> states, hmatrix<> m_dist, int n_samples){
+    // generate an initial state i, where states[i] = probability of that state
+    hvec<> c_states = gen_cumulative_dist(states);
+    int curr_state = gen_state(c_states);
+    RAND_ENG::RNG rng;
+
+    // states that are going to be sampled
+    hvec<> sampled_states(n_samples);
+
+    for(int i=0; i<n_samples; i++){
+        // generate another state, from m_dist[current_state]
+        hvec<> next_possible_states = m_dist[i];
+        auto s_dist = gen_cumulative_dist(next_possible_states);
+        int next_state = gen_state(s_dist);
+
+        // acceptance ratio
+        quadruple acceptance_r = (norm_density(next_state)) / (norm_density(curr_state));
+
+        quadruple num = rng.gen_quad(0, 1);
+        // if acceptance ratio is at most a randomly generated value between [0, 1], then accept and transition to new state
+        // else stay at current state
+        if(acceptance_r <= num){
+            curr_state = next_state;
+        }
+        
+    }
 }
 
 // randomized min cut of ADT struct

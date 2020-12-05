@@ -250,6 +250,21 @@ public:
     ~hvec(){}
 
     void print(){ return; }
+    int len() const{ return dimensions[0]; }
+    // resize the vector, if size > current size, then append extra 0's
+    // else truncate the vector
+    int resize(int size){
+        T* new_values = new T[size];
+        // can definitely implement functional programming here
+        for(int i=0; i<size; i++){
+            if(i>=dimensions[0]) new_vec[i] = 0;
+            else new_vec[i] = values[i];
+        }
+        delete[] values;
+        values = new_values;
+        dimensions[0] = size;
+        n_values = size;
+    }
     // returns a transposed T
     hvec T(){ hvec res(*this); res.column_vec = !column_vec; return res; }
 

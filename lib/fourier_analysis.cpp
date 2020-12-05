@@ -26,6 +26,28 @@ cvec dft(const qvec& x){
     return dft_res;
 }
 
+/**
+ * Tensor-based DFT -> works on hvecs.
+ * O(n^2), note if always calling dft(x) on a constant size x, then O(1)
+ */
+hvec<complexv> dft(const hvec<>& x){
+    int N = x.len();
+    if( !IS_INT(log2(N)) ){
+        // common way to find next power. Not as fast, but works.
+        N = pow(2, ceil(log2(N)));
+        x.resize(N);
+    }
+
+    hvec<complexv> dft_res(N);
+
+    for(int k=0; k<N; k++)
+        for(int j=0; j<N; j++){
+            dft_res[k] += complexv(-2*c_pi*k*j/N) * ((double)x[j]);
+        }
+
+    return dft_res;
+}
+
 // Inverse DFT
 qvec inverse_dft(const cvec& x){
     return qvec(1);
@@ -39,7 +61,10 @@ qvec inverse_dft(const cvec& x){
 cvec fft_v1(const qvec& x){
     int N = x.len();
     // quick append -> happens at most once on call
-    if(!IS_INT(log2(N))) N = pow(2, ceil(log2(N)));
+    if(!IS_INT(log2(N))){
+        N = pow(2, ceil(log2(N)));
+        x.resize(N);
+    }
     
     if(N == 2) return dft(x);
     
