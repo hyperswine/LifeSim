@@ -92,6 +92,31 @@ public:
     }
 };
 
+// cpair but takes two different classes
+template <class T1, class T2> class fpair{
+private:
+    T1 x;
+    T2 y;
+
+public:
+    fpair(T1& a, T2& b){
+        x = a;
+        y = b;
+    }
+
+    T1 get_first(){
+        return x;
+    }
+
+    T2 get_second(){
+        return y;
+    }
+
+    bool operator==(fpair<T1, T2> &oth_t){
+        return (x == oth_t[0] && y == oth_t[1]);
+    }
+};
+
 const unsigned int max_val = 0xFFFFFFFF;
 const unsigned int char_bits = 0x0000000F;
 

@@ -68,7 +68,7 @@ void svd(hmatrix<quadruple> M){
  * In - A vector of probabilities, each being between (0, 1)
  * Out - A cumulative distribution starting from i=0 to i=n-1
  */
-static hvec<> gen_cumulative_dist(hvec<> weighted_states){
+inline static hvec<> gen_cumulative_dist(hvec<> weighted_states){
     hvec cumulative_states(weighted_states.len());
     quadruple cumulative_sum = 0;
 
@@ -83,7 +83,7 @@ static hvec<> gen_cumulative_dist(hvec<> weighted_states){
 /**
  * Generate a state s, where s in [0, 1...n] sfrom a cumulative distribution c.
  */
-static quadruple gen_state(hvec<> c_dist){
+inline static quadruple gen_state(hvec<> c_dist){
     RAND_ENG::RNG rng;
     quadruple sample_weight = rng.gen_quad(0, 1);
     quadruple sample = 0;
@@ -101,7 +101,7 @@ static quadruple gen_state(hvec<> c_dist){
 /**
  * A sample function that maps R -> R, making a normally distributed targe density
  */
-static quadruple norm_density(){
+inline static quadruple norm_density(){
     return 0;
 }
 

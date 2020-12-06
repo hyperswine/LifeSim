@@ -2,6 +2,8 @@
 
 #include "hmath"
 
+#include <utility>
+
 typedef struct __cell{
     // Matrix of N x 3, of all positions of the particles in the cell
     qmatrix M;
@@ -29,3 +31,16 @@ typedef struct __cell_list{
     CELL* end() { return all_cells + k_cells; }
 
 } CELL_LIST;
+
+// A wrapper around a vector representing the count of neighboring cells
+typedef struct _verlet_list{
+    hvec<> v_list;
+} V_LIST;
+
+struct _verlet_table{
+    // for each particle, contains all nearest image neighbors
+    // basically, particle i -> [(j, 0), (k, 2) ...]
+    hmatrix<std::pair<int,int>> neighbors;
+
+    int N;
+} V_TABLE;

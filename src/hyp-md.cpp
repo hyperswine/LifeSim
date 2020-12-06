@@ -1,10 +1,9 @@
 // NOTE: maybe require types to be quadruples, in case of division by zero
 #include "md.h"
-#include "hyper_math/hypmath.h"
-#include "hyper_math/rng_engine.h"
-#include "hyper_math/qtensor.h"
+#include "hypmd"
+#include "hmath"
+
 #include <iostream>
-using namespace std;
 
 enum POTENTIALS{
     LJ, BHM, CUST
@@ -12,21 +11,59 @@ enum POTENTIALS{
 
 const quadruple argon_eps = 3.4e-8;
 const quadruple argon_sigma = 1.7e-14;
+const int space3d = 3;
 
-void welcome_message(){
-    std::cout << "\n\t========================" << std::endl;
-    std::cout << "\t  Welcome to Hyper Sim" << std::endl;
-    std::cout << "\t========================" << std::endl;
+/**
+ * In - Cell list containing simulation boxes
+ */
+fpair<V_LIST, V_TABLE> build_verlet(CELL_LIST& cl, int r_s){
+    V_LIST v_list;
+    V_TABLE v_table;
+
+    for(int i=0; i<cl.N; i++){
+        for(int j=0; j<cl.N; j++){
+            // for i -> j, get the nearest image of j
+            int nearest_j = nearest_image(cl, i, j);
+
+            if(dist(cl[0][i], cl[nearest_j][j]) < r_s){
+                V_TABLE[i].push_back(j);
+                v_list[i]++;
+            }
+        }
+    }
+
+    return fpair<V_LIST, V_TABLE>(v_list, v_table);
 }
 
+/**
+ * Computes all velocities and positions of the next timestep.
+ */
+inline cpair<hmatrix<>> verlet_integration(int index, hmatrix<> positions, hmatrix<> velocities, quadruple delta){
+    hmatrix<> next_velocities(velocities.rows(), velocities.cols());
+    hmatrix<> next_positions(positions.rows(), positions.cols());
+
+    hvec<> r_next(space3d);
+    hvec<> v_next(space3d);
+
+    for(int i=0; i<positions.len(); i++){
+        hvec<> a_i = force_potential(r_i, i, r_c);
+
+        r_next = r_i*2 + r_prev + a_i * pow(delta,2);
+        v_next = (r_next - r_prev)/(2 * delta);
+        next_velocities[i] = v_next;
+        next_positions[i] = r_next;
+    }
+    
+    return cpair<hmatrix<>>(next_velocities, next_positions);
+}
 
 cpair<qvec> verlet_integration(qvec& r_prev, qvec& r_i, qvec& v_i, quadruple delta){
     // initialize next pos & vel's to 0 vectors
-    qvec r_next(r_i.len());
-    qvec v_next(v_i.len());
+    qvec r_next(space3d);
+    qvec v_next(space3d);
 
-    // TODO: compute accelerations by computing force potentials then taking the negative partial derivative
-    qvec a_i(r_i.len());
+    // compute accelerations by computing force potentials then taking the negative partial derivative
+    qvec a_i(r_i.len()) = force_potential(r_i, i, r_c);
 
     r_next = r_i*2 + r_prev + a_i * pow(delta,2);
     v_next = (r_next - r_prev)/(2 * delta);
@@ -145,13 +182,13 @@ void naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) 
         for (int j = 0; j < n_particles; j++) {
 
             // r_j = integrate velocity of current particle according to runge-kutta 4th scheme
-            // positions[i][j] = first_approx(positions[i-1][j], velocities[i-1][j], dt);
+            positions[i][j] = first_approx(positions[i-1][j], velocities[i-1][j], dt);
 
             // if the position exceeds boundaries, apply reflective boundary condition, i.e. in this case simply
             // move it back in the opposite direction of limits by some factor x
-            // if(boundary_condition(positions[i][j], a, b)){
-            //     apply_reflective(positions[j]);
-            // }
+            if(boundary_condition(positions[i][j], a, b)){
+                apply_reflective(positions[j]);
+            }
 
             // calculate all the forces acting on this particle
             // partial derivative of sum(V(r_jk)) where j>k
@@ -160,8 +197,8 @@ void naive_md(int n_particles, int n_timesteps, int a, int b, bool output_file) 
             // calculate acceleration
             accelerations[i][j] = f[j];
 
-            // v_(j+1) = integrate acceleration
-            // velocities[i][j] = first_approx(velocities[i][j], accelerations[i][j]);
+            v_(j+1) = integrate acceleration
+            velocities[i][j] = first_approx(velocities[i][j], accelerations[i][j]);
 
         }
     }

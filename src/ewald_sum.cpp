@@ -31,21 +31,3 @@ void particle_ewald();
 
 // NOTE: for many purposes, this method isn't actually required so simpler boundary conditions can be used instead to simulate a restricted box.
 
-/**
- * In - two position vectors, r_i, r_j
- *    - cell list
- * Out - cell k, where the nearest r_j(k) is to the main r_i
- */
-int nearest_image(CELL_LIST* cl, int i, int j){
-    // cell that contains minimum distance between r_i and r_j.
-    // By default start with main cell
-    int k_min = 0;
-    quadruple d_min = dist(cl[0]->M[i], cl[1]->M[j];
-    for(int i=0; i<cl->k_cells; i++){
-        if(dist(c->M[i], c->M[j]) < d_min){
-            k_min = i;
-        }
-    }
-
-    return k_min;
-}
