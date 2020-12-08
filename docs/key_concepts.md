@@ -6,8 +6,6 @@
 What we're basically doing here is creating a static library of source (.cpp) files and headers (.h) that our app interfaces with.
 
 ## 'Discrete' Verlet Algorithm
-Reference = Reversible  multiple  time  scale  molecular dynamics, M. Tuckerman, B. J. Berne, and G. J. Martyna, J. Chem. Phys. 97, 1990 (1992)
-
 This is used to compute positions and velocities. It is based on the taylor expansion, which we don't have to implement directly.
 Note, we require the position of r_i at the next timestep to predict the velocity, which we can then use again to make a
 better prediction of the position of r_i at the next timestep.
