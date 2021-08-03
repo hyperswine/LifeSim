@@ -1,3 +1,3 @@
 ## HYPERSIM
 
-A simulator playground.
+A simulator playground for particles.
