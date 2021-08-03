@@ -76,7 +76,13 @@
         "utests_x": "cpp",
         "htensor": "cpp",
         "hmath": "cpp",
-        "hypmd": "cpp"
+        "hypmd": "cpp",
+        "*.tcc": "cpp",
+        "clocale": "cpp",
+        "cwctype": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "string_view": "cpp"
     },
     "cSpell.words": [
         "complexv",
